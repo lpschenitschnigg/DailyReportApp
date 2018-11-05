@@ -54,7 +54,7 @@ class AgendaComponent extends Component {
           //this.setState({listViewData: this._color(aufgaben)})
           //aufgaben.reverse();
           this.setState({aufgaben: aufgaben});
-          console.log(this.aufgaben)
+          //console.log(this.aufgaben)
       })
     }
     _onRefresh=()=> {
