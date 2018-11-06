@@ -52,6 +52,7 @@ class AufgabeErstellen extends Component {
     constructor(props) {
         super(props);
         var toTime = new Date();
+        toTime.setHours(toTime.getHours() + 4);
         this.state = {
             from: '',
             to: '',
@@ -420,6 +421,7 @@ class AufgabeErstellen extends Component {
                                     },
                                     dateText: {
                                         color: this.state.colorfour,
+                                        fontFamily: 'siemens_global_bold'
                                     },
                                     dateTouchBody: {
                                         //: '#009999'
@@ -469,6 +471,7 @@ class AufgabeErstellen extends Component {
                                     },
                                     dateText: {
                                         color: this.state.coloreight,
+                                        fontFamily: 'siemens_global_bold'
                                     },
                                     dateTouchBody: {
                                         //: '#009999'
