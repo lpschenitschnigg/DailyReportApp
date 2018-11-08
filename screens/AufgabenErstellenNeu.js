@@ -47,7 +47,7 @@ class AufgabeErstellen extends Component {
     //   this._hideDateTimePicker();
     // };
     static navigationOptions = {
-        headerTitle: <Text style={{ fontFamily: 'siemens_global_bold',fontSize: 28, lineHeight: 34, color: "#009999", left: 20}}>Aufgabe Erstellen</Text>,
+        headerTitle: <Text style={{ fontFamily: 'siemens_global_bold',fontSize: 28, lineHeight: 34, color: "#009999", left: 20}}>Meldung Erstellen</Text>,
     }
     constructor(props) {
         super(props);

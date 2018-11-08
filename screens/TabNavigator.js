@@ -60,7 +60,7 @@ const AppTabNavigator = createBottomTabNavigator({
             // }
         }
     },
-    Aufgaben: {screen: StackAufgaben,
+    Statusmeldung: {screen: StackAufgaben,
         navigationOptions: {
             tabBarIcon:({tintColor})=> (
                 <Icon name="md-checkmark-circle-outline" style={{color: tintColor}} size={24}/>
@@ -94,8 +94,8 @@ const AppTabNavigator = createBottomTabNavigator({
         }
     },
 },{
-    initialRouteName:'Aufgaben',
-    order:['Agenda', 'Aufgaben', 'Störungen'],
+    initialRouteName:'Statusmeldung',
+    order:['Agenda', 'Statusmeldung', 'Störungen'],
     tabBarOptions: {
         activeTintColor: '#009999',
         // activeBackgroundColor: 'red',
