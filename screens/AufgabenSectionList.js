@@ -1,11 +1,12 @@
 //import liraries
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, SectionList, ScrollView, RefreshControl, DeviceEventEmitter, TouchableOpacity, FlatList } from 'react-native';
+import { View, Text, StyleSheet, SectionList, ScrollView, RefreshControl, DeviceEventEmitter, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
 import { Button, Icon, List, Content } from 'native-base';
 import Moment from 'react-moment';
 import moment from 'moment';
 import Modal from 'react-native-modal';
 import {StoreGlobal} from './WelcomeScreen';
+import SmartLoader from './SmartLoader';
 
 // const Right = ({onPress}) => {
 //     <TouchableOpacity onPress={onPress}>
@@ -21,7 +22,7 @@ class AufgabenSectionList extends Component {
             dataT: [],
             dataY: [],
             dataW: [],
-            aufgaben: [],
+            aufgaben: null,
             currDate: '',
             currDateF: '',
             currDateT: '',
@@ -31,6 +32,7 @@ class AufgabenSectionList extends Component {
             wocheE: '',
             refreshing: false,
             isModalVisible: false,
+            loading: false,
             fixedHash: '9FFKqvr-iOfrwRkr48TCm-xqf6zjWUQqu063E9X3fRek9peiqq-edilVWGhRVMlweHR4',
             //fixedHash: StoreGlobal({type: 'get', key: 'ok'}),
         }
@@ -146,8 +148,8 @@ class AufgabenSectionList extends Component {
             },
             body: JSON.stringify({
                 "fixedHash": this.state.fixedHash,
-                "from": '2018-10-5T00:00:00+02:00',
-                "to": '2018-10-5T23:59:59+02:00',
+                "from": '2018-09-01T00:00:00+02:00',
+                "to": '2018-12-31T23:59:59+02:00',
             }),
         })
         .then(response => (response.json()))
@@ -321,8 +323,8 @@ class AufgabenSectionList extends Component {
             },
             body: JSON.stringify({
                 "fixedHash": this.state.fixedHash,
-                "from": '2018-10-5T00:00:00+02:00',
-                "to": '2018-10-5T23:59:59+02:00',
+                "from": '2018-09-01T00:00:00+02:00',
+                "to": '2018-12-31T23:59:59+02:00',
             }),
         })
         .then(response => (response.json()))
@@ -500,7 +502,17 @@ class AufgabenSectionList extends Component {
         // const { navigation } = this.props;
         // const fixedHash = navigation.getParam('hash', 'asdf');
         // console.log(fixedHash);
-        if (this.state.wocheA === moment(new Date()).format('YYYY-MM-DD') || this.state.wocheA === this.state.yesterday) {
+        
+            if (!this.state.aufgaben) {
+                return (
+                    <ActivityIndicator
+                    animating={true}
+                    style={styles.indicator}
+                    size="large"
+                    />
+                );
+            }
+            if (this.state.wocheA === moment(new Date()).format('YYYY-MM-DD') || this.state.wocheA === this.state.yesterday) {
             return ( //https://doc.ebichu.cc/react-native/releases/0.44/docs/sectionlist.html
                 <View style={{flex: 1}}
                 // refreshControl={
@@ -688,6 +700,12 @@ const styles = StyleSheet.create({
         borderRadius: 77/2, justifyContent: 'center',
         right: 15,
     },
+    indicator: {
+        flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: 80
+      }
 });
 
 //make this component available to the app
