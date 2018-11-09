@@ -19,13 +19,7 @@ const client = new ApolloClient({
     cache: new InMemoryCache()
 });
 
-// client.query({
-//     query: gql`
-//     {
-//         allCustomers {id, name, city, street}
-//     }
-//     `
-// }).then(result => console.log(result));
+
 
 // create a component
 class AufgabeErstellen extends Component {
@@ -100,6 +94,7 @@ class AufgabeErstellen extends Component {
             to2: toTime,
             disabled: false,
             //opacity: 1,
+            
         };
         // DeviceEventEmitter.addListener('refresh', (e) => {
         //     this._onRefresh();
@@ -137,6 +132,13 @@ class AufgabeErstellen extends Component {
         //     console.log(result)
         // });
         // console.log("kunden", this.state.kunden);
+        client.query({
+            query: gql`
+            {
+                allCustomers {id, name, city, street}
+            }
+            `
+        }).then(result => console.log(result));
     }
     
     componentDidMount() {
