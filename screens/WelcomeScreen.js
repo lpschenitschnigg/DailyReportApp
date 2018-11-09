@@ -3,7 +3,8 @@ import {
     StyleSheet, Text, View, Image,
     TouchableWithoutFeedback, StatusBar,
     TextInput, SafeAreaView, Keyboard, TouchableOpacity,
-    KeyboardAvoidingView, Button, Alert, ToastAndroid
+    KeyboardAvoidingView, Button, Alert, ToastAndroid,
+    AsyncStorage
 } from 'react-native'
 import { Label, Toast } from 'native-base';
 // import Expo from "expo";
@@ -17,6 +18,7 @@ import { ApolloClient } from 'apollo-client';
 import { HttpLink } from 'apollo-link-http';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import gql from "graphql-tag";
+
 
 const globalState = {}; // https://stackoverflow.com/questions/44227235/global-state-in-react-native
 export const StoreGlobal = (obj) => {
@@ -98,6 +100,7 @@ class WelcomeScreen extends Component {
     static token;
     componentDidMount() {
         this.registerForPushNotificationAsync();
+        this._retrieveData();
     }
     _sendToServer(name) {
         client.query({
@@ -154,6 +157,7 @@ class WelcomeScreen extends Component {
         })
         .then(response => (response.json()))
         .then((responseData) => {
+            this._storeData(responseData.fixedHash);
             console.log(responseData);   
             this._sendToServer(name);    
             console.log(responseData.fixedHash);
@@ -190,6 +194,25 @@ class WelcomeScreen extends Component {
             // })
         });
         
+    }
+    _storeData = async (hash) => {
+        try {
+            await AsyncStorage.setItem('fixedHash', hash);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+    _retrieveData = async () => {
+        try {
+            const value = await AsyncStorage.getItem('fixedHash');
+            if (value !== null) {
+              // We have data!!
+              console.log(value);
+              this.props.navigation.navigate('TabNavigator');
+            }
+           } catch (error) {
+                console.log(error);
+           }
     }
     registerForPushNotificationAsync = async () => {
         const { status: existingStatus } = await Permissions.getAsync(

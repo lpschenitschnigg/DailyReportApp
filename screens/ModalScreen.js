@@ -1,9 +1,19 @@
 //import liraries
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, Button, TouchableOpacity, Image } from 'react-native';
+import { View, Text, StyleSheet, Button, TouchableOpacity, Image, AsyncStorage } from 'react-native';
 
 // create a component
 class ModalScreen extends Component {
+    async removeItemValue(key) {
+        try {
+          await AsyncStorage.removeItem('fixedHash');
+          console.log('removed');
+          return true;
+        }
+        catch(exception) {
+          return false;
+        }
+      }
     render() {
         return (
             <View style={{backgroundColor: '#fff', height: '100%'}}>
@@ -18,7 +28,7 @@ class ModalScreen extends Component {
                         onPress={() => this.props.navigation.goBack()}
                         title="Nein"
                     /> */}
-                    <TouchableOpacity style={styles.buttonContainer} onPress={() => this.props.navigation.navigate('WelcomeScreen')}>
+                    <TouchableOpacity style={styles.buttonContainer} onPress={() => this.props.navigation.navigate('WelcomeScreen') && this.removeItemValue()}>
                         <Text style={styles.buttonText}>Ja</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.buttonContainer} onPress={() => this.props.navigation.goBack()}>

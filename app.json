@@ -1,8 +1,8 @@
 {
   "expo": {
-    "name": "DailyReport_V4",
+    "name": "DailyReport_V5",
     "description": "This project is really great.",
-    "slug": "DailyReport_V4",
+    "slug": "DailyReport_V5",
     "privacy": "public",
     "sdkVersion": "30.0.0",
     "platforms": [
