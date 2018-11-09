@@ -103,7 +103,7 @@ class WelcomeScreen extends Component {
         client.query({
             query: gql`
             {
-                allAppusers{hash, username}
+                allAppusers{token, username, date, fixedHash}
             }
             `
         }).then(result => {
@@ -111,19 +111,21 @@ class WelcomeScreen extends Component {
             //console.log(dataQuery);
             let trigger = false;
             dataQuery.forEach(element => {
-                if (this.state.token == element.hash) {
+                if (this.state.token == element.token) {
                     console.log("Same!");
                     trigger = true;
                 }
             });
             if (trigger == false) {
                 client.mutate({
-                    variables: { hash: this.state.token, username: name },
+                    variables: { token: this.state.token, username: name, fixedHash: StoreGlobal({type: 'get', key: 'ok'}), date: moment(new Date()) },
                     mutation: gql`
-                        mutation createAppuser($hash: String!, $username: String!){
-                            createAppuser(hash: $hash, username: $username ) {
-                                hash
+                        mutation createAppuser($token: String!, $username: String!, $date: DateTime, $fixedHash: String){
+                            createAppuser(token: $token, username: $username, date: $date, fixedHash: $fixedHash) {
+                                token
                                 username
+                                date
+                                fixedHash
                             }
                         }
                     `,
