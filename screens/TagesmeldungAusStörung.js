@@ -12,8 +12,6 @@ import { HttpLink } from 'apollo-link-http';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import gql from "graphql-tag";
 import {StoreGlobal} from './WelcomeScreen';
-import {StoreCus} from './Kundenauswahl';
-import {StoreTyp} from './Types';
 
 const client = new ApolloClient({
     link: new HttpLink({
@@ -25,7 +23,7 @@ const client = new ApolloClient({
 
 
 // create a component
-class AufgabeErstellen extends Component {
+class TagesmeldungAusStörung extends Component {
     _showCurrentDate=()=>{
         var date = new Date().getDate();
         var month = new Date().getMonth();
@@ -53,10 +51,9 @@ class AufgabeErstellen extends Component {
         this.state = {
             from: '',
             to: '',
-            title: '',
-            content: '',
-            cus: StoreCus({type: 'get', key: 'ok'}),
-            typ: StoreTyp({type: 'get', key: 'ok'}),
+            title: this.props.navigation.state.params.title,
+            id: this.props.navigation.state.params.id,
+            content: this.props.navigation.state.params.content,
             showToast: true,
             //isDateTimePickerVisible: false,
             //cat: this.props.navigation.state.params.cat,
@@ -99,7 +96,6 @@ class AufgabeErstellen extends Component {
             to2: toTime,
             disabled: false,
             fixedHash: StoreGlobal({type: 'get', key: 'ok'}),
-            
             //opacity: 1,
             
         };
@@ -142,7 +138,7 @@ class AufgabeErstellen extends Component {
         client.query({
             query: gql`
             {
-                allCustomers {id, name, city, street, plz}
+                allCustomers {id, name, city, street}
             }
             `
         }).then(result => {
@@ -157,7 +153,7 @@ class AufgabeErstellen extends Component {
         fetch('https://asc.siemens.at/datagate/external/Calendar/planned', {
             method: 'GET',
             headers: { 
-            'userhash': '9FFKqvr-iOfrwRkr48TCm-xqf6zjWUQqu063E9X3fRek9peiqq-edilVWGhRVMlweHR4',
+            'userhash': this.state.fixedHash,
             'Content-Type': 'application/json',
             },
         })
@@ -209,7 +205,7 @@ class AufgabeErstellen extends Component {
                  'Content-Type': 'application/json',
                  },
                  body: JSON.stringify({
-                 "fixedHash":"9FFKqvr-iOfrwRkr48TCm-xqf6zjWUQqu063E9X3fRek9peiqq-edilVWGhRVMlweHR4",
+                 "fixedHash":this.state.fixedHash,
                  "from": from,
                  "to": to,
                  'title': title,
@@ -222,6 +218,25 @@ class AufgabeErstellen extends Component {
                  ToastAndroid.showWithGravity("Task erstellt", ToastAndroid.LONG, ToastAndroid.BOTTOM);
                  DeviceEventEmitter.emit('refresh');
                  this.props.navigation.navigate('Aufgaben' ,{refresh: true});
+
+                 //this._delCard(this.state.id);
+                //  delCard(cardId) {
+                //      console.log(cardId);
+                //      client.mutate({
+                //          variables: {id: cardId},
+                //          mutation: TrelloCard_DELETE,
+                //      }).then( () => {
+                //      }).catch(error =>  {
+                //          console.log(error);
+                //      };)
+                //  }
+                //  const TrelloCard_DELETE = gql`
+                //     mutation DeleteTrelloCard($id: this.props.navigation.state.params.id){
+                //     deleteTrelloCard(id: $id) {
+                //         id
+                //         }
+                //     }
+                // `;
              }).catch((error) => {
                  console.error(error);
                  ToastAndroid.showWithGravity("Fehler", ToastAndroid.LONG, ToastAndroid.BOTTOM);
@@ -238,6 +253,23 @@ class AufgabeErstellen extends Component {
             ToastAndroid.showWithGravity("Keine Zeit ausgewählt", ToastAndroid.LONG, ToastAndroid.BOTTOM);
         }
     };
+    // _delCard(cardId) {
+    //     const TrelloCard_DELETE = gql`
+    //         mutation DeleteTrelloCard($id: ID!){
+    //         deleteTrelloCard(id: $id) {
+    //             id
+    //             }
+    //         }
+    //     `;
+    //     console.log(cardId);
+    //     client.mutate({
+    //         variables: {id: cardId},
+    //         mutation: TrelloCard_DELETE,
+    //     }).then( () => {
+    //     }).catch(error =>  {
+    //         console.log(error);
+    //     });
+    // }
     _vorhanden(from) {
         var vorhanden = false;
         this.state.aufgaben.forEach(item => {
@@ -260,23 +292,11 @@ class AufgabeErstellen extends Component {
         //     //console.error(error);
         //     ToastAndroid.showWithGravity("Fehler", ToastAndroid.LONG, ToastAndroid.BOTTOM);
         // }
-    componentDidMount() {
-            //var cat ="";
-            //this.setState({cat: category});
-            this.setState({cus: StoreCus({type: 'get', key: 'ok'}) });
-            this.setState({typ: StoreTyp({type: 'get', key: 'ok'}) });
-            console.log(this.state.cus);
-    }
-    // componentDidUpdate() {
-    //     render =() => {
-    //         return(
-    //             <View><TouchableOpacity onPress={() => this.props.navigation.navigate('Kundenauswahl', {kunden: this.state.kunden})}><Text>Kunde auswählen</Text></TouchableOpacity>
-    //             <Label style={styles.labelText}>Kunde: {this.state.cus}</Label></View>
-    //         );
-    //     }
-    // }
-    // componentWillUpdate() {
-    //     this.setState({cus: StoreCus({type: 'get', key: 'ok'}) });
+    // componentDidMount() {
+    //         //var cat ="";
+    //         //this.setState({cat: category});
+    //         this.setState({cat: this.props.navigation.state.params.cat});
+    //         console.log(this.state.cat);
     // }
     _select(id, time) {
         if (id === 1) {
@@ -340,7 +360,6 @@ class AufgabeErstellen extends Component {
         }
     }
     render() {
-        console.log(StoreCus({type: 'get', key: 'ok'}));
         if(this.props.loading) return null;
         //const { params } = this.props.navigation.state;
         //const category = params ? this.props.navigation.state.params.cat : 'Nichts ausgewählt';
@@ -354,166 +373,159 @@ class AufgabeErstellen extends Component {
         // console.log(to);
         // const from = params ? this.props.navigation.state.params.from : this.ddate;
         // console.log(from);
-       
-            return (
-                <ApolloProvider client={client}>
-                <ScrollView style={{ backgroundColor: "#EAEAEA",
-                    padding: 15,
-                    paddingTop: 15}}>
-                    <View style={{ paddingLeft: 18, paddingRight: 18, paddingBottom: 15,
-                        paddingTop: 10,
-                        borderRadius: 10,
-                        backgroundColor: '#fff'}}>
-                        <Label style={{paddingTop: 18, fontSize: 18, marginBottom: 10, fontSize: 15, marginBottom: 10, color: '#606060', lineHeight: 18, fontFamily: 'siemens_global_bold'}}>Ort/Kunde</Label>
-                            <TextInput style={styles.input} 
-                                placeholder='Ort/Kunde...'
-                                value={this.state.title}
-                                placeholderTextColor='#606060'
-                                underlineColorAndroid='#F1F1F1'
-                                returnKeyType='next'
-                                autoCorrect={false}
-                                ref={"txtTitle"}
-                                onSubmitEditing={()=> this.refs.txtContent.focus()}
-                                onChangeText={(text)=> this.setState({title: text})}
-                            />
-                        <TouchableOpacity onPress={() => this.props.navigation.navigate('Kundenauswahl', {kunden: this.state.kunden})}><Text>Kunde auswählen</Text></TouchableOpacity>
-                        <Label style={styles.labelText}>Kunde: {this.state.cus}</Label>
 
-                        <TouchableOpacity onPress={() => this.props.navigation.navigate('Types')}><Text>Typ auswählen</Text></TouchableOpacity>
-                        <Label style={styles.labelText}>Typ: {this.state.typ}</Label>
-                        <Label style={styles.labelText}>Info</Label>
-                            <TextInput style={{ backgroundColor: '#F1F1F1', height: 109,
-                                        borderRadius: 6,
-                                        color: '#606060',
-                                        fontSize: 15,
-                                        lineHeight: 18,
-                                        marginBottom: 20,
-                                        paddingHorizontal: 10, 
-                                        fontFamily: 'siemens_global_bold'}} 
-                                placeholder='Info....'
-                                underlineColorAndroid='#F1F1F1'
-                                value={this.state.content}
-                                multiline = {true}
-                                numberOfLines = {4}
-                                placeholderTextColor='#606060'
-                                returnKeyType='next'
-                                autoCorrect={false}
-                                ref={"txtContent"}
-                                onChangeText={(text)=> this.setState({content: text})}
+        return (
+            <ApolloProvider client={client}>
+            <ScrollView style={{ backgroundColor: "#EAEAEA",
+                padding: 15,
+                paddingTop: 15}}>
+                <View style={{ paddingLeft: 18, paddingRight: 18, paddingBottom: 15,
+                    paddingTop: 10,
+                    borderRadius: 10,
+                    backgroundColor: '#fff'}}>
+                    <Label style={{paddingTop: 18, fontSize: 18, marginBottom: 10, fontSize: 15, marginBottom: 10, color: '#606060', lineHeight: 18, fontFamily: 'siemens_global_bold'}}>Ort/Kunde</Label>
+                        <TextInput style={styles.input} 
+                            placeholder='Ort/Kunde...'
+                            value={this.state.title}
+                            placeholderTextColor='#606060'
+                            underlineColorAndroid='#F1F1F1'
+                            editable={false}
+                            returnKeyType='next'
+                            autoCorrect={false}
+                            ref={"txtTitle"}
+                        />
+                    <Label style={styles.labelText}>Info</Label>
+                        <TextInput style={{ backgroundColor: '#F1F1F1', height: 109,
+                            borderRadius: 6,
+                            color: '#606060',
+                            fontSize: 15,
+                            lineHeight: 18,
+                            marginBottom: 20,
+                            paddingHorizontal: 10, 
+                            fontFamily: 'siemens_global_bold'}} 
+                            placeholder='Info....'
+                            underlineColorAndroid='#F1F1F1'
+                            value={this.state.content}
+                            multiline = {true}
+                            numberOfLines = {4}
+                            placeholderTextColor='#606060'
+                            returnKeyType='next'
+                            autoCorrect={false}
+                            ref={"txtContent"}
+                            onChangeText={(text)=> this.setState({content: text})}
+                        />
+                    {/* <Label style={styles.labelText}>Typ: Visit</Label>  */}
+                    <Label style={styles.labelText}>Beginn</Label>
+                        <View style={{flex: 1, flexDirection: 'row', paddingBottom: 20, justifyContent: 'space-between'}}>
+                            <TouchableOpacity onPress={() => this._select(1, '07:30')} style={{ width: 68, borderColor: this.state.colorone, borderRadius: 6, borderWidth: 1.75}}>
+                                <Text style={{color: this.state.colorone, fontSize: 15, lineHeight: 18, fontFamily: 'siemens_global_bold', textAlign: 'center', paddingVertical: 16}}>07:30</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity  onPress={() => this._select(2, '08:00')} style={{width: 68, borderColor: this.state.colortwo, borderRadius: 6, borderWidth: 1.75}}>
+                                <Text style={{color:this.state.colortwo, fontSize: 15, lineHeight: 18, fontFamily: 'siemens_global_bold', textAlign: 'center', paddingVertical: 16}}>08:00</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity  onPress={() => this._select(3, '08:30')} style={{ width: 68, borderColor: this.state.colorthree, borderRadius: 6, borderWidth: 1.75}}>
+                                <Text style={{color:this.state.colorthree, fontSize: 15, lineHeight: 18, fontFamily: 'siemens_global_bold', textAlign: 'center', paddingVertical: 16}}>08:30</Text>
+                            </TouchableOpacity>
+                            <DatePicker
+                                style={{ width: 68, borderColor: this.state.colorfour, borderRadius: 6, borderWidth: 2}}
+                                mode="time"
+                                is24Hour={true}
+                                date={this.state.from2}
+                                format="HH:mm"
+                                minDate="2018-07-09"
+                                maxDate="2018-12-31"
+                                confirmBtnText="Confirm"
+                                cancelBtnText="Cancel"
+                                showIcon={this.state.show1}
+                                hideText={this.state.show1}
+                                //color='#009999'
+                                iconSource={require('./time.png')}
+                                customStyles={{
+                                    dateIcon: {
+                                        //backgroundColor: '#979797'
+                                        marginTop:9,
+                                        width:25,
+                                        height:25
+                                    },
+                                    dateInput: {
+                                        paddingTop: 10,
+                                        borderWidth: 0,
+                                        //fontWeight: "bold",
+                                        //color: this.state.colorfour,
+                                        
+                                    },
+                                    dateText: {
+                                        color: this.state.colorfour,
+                                        fontFamily: 'siemens_global_bold'
+                                    },
+                                    dateTouchBody: {
+                                        //: '#009999'
+                                    }
+                                }}
+                                onDateChange={(datetime) => {this.setState({from2: datetime} && {hideText: true} &&this._select(4, datetime)); this.setState({show1:false})}}
                             />
-                        {/* <Label style={styles.labelText}>Typ: Visit</Label>  */}
-                        <Label style={styles.labelText}>Beginn</Label>
-                            <View style={{flex: 1, flexDirection: 'row', paddingBottom: 20, justifyContent: 'space-between'}}>
-                                <TouchableOpacity onPress={() => this._select(1, '07:30')} style={{ width: 68, borderColor: this.state.colorone, borderRadius: 6, borderWidth: 1.75}}>
-                                    <Text style={{color: this.state.colorone, fontSize: 15, lineHeight: 18, fontFamily: 'siemens_global_bold', textAlign: 'center', paddingVertical: 16}}>07:30</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity  onPress={() => this._select(2, '08:00')} style={{width: 68, borderColor: this.state.colortwo, borderRadius: 6, borderWidth: 1.75}}>
-                                    <Text style={{color:this.state.colortwo, fontSize: 15, lineHeight: 18, fontFamily: 'siemens_global_bold', textAlign: 'center', paddingVertical: 16}}>08:00</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity  onPress={() => this._select(3, '08:30')} style={{ width: 68, borderColor: this.state.colorthree, borderRadius: 6, borderWidth: 1.75}}>
-                                    <Text style={{color:this.state.colorthree, fontSize: 15, lineHeight: 18, fontFamily: 'siemens_global_bold', textAlign: 'center', paddingVertical: 16}}>08:30</Text>
-                                </TouchableOpacity>
-                                <DatePicker
-                                    style={{ width: 68, borderColor: this.state.colorfour, borderRadius: 6, borderWidth: 2}}
-                                    mode="time"
-                                    is24Hour={true}
-                                    date={this.state.from2}
-                                    format="HH:mm"
-                                    minDate="2018-07-09"
-                                    maxDate="2018-12-31"
-                                    confirmBtnText="Confirm"
-                                    cancelBtnText="Cancel"
-                                    showIcon={this.state.show1}
-                                    hideText={this.state.show1}
-                                    //color='#009999'
-                                    iconSource={require('./time.png')}
-                                    customStyles={{
-                                        dateIcon: {
-                                            //backgroundColor: '#979797'
-                                            marginTop:9,
-                                            width:25,
-                                            height:25
-                                        },
-                                        dateInput: {
-                                            paddingTop: 10,
-                                            borderWidth: 0,
-                                            //fontWeight: "bold",
-                                            //color: this.state.colorfour,
-                                            
-                                        },
-                                        dateText: {
-                                            color: this.state.colorfour,
-                                            fontFamily: 'siemens_global_bold'
-                                        },
-                                        dateTouchBody: {
-                                            //: '#009999'
-                                        }
-                                    }}
-                                    onDateChange={(datetime) => {this.setState({from2: datetime} && {hideText: true} &&this._select(4, datetime)); this.setState({show1:false})}}
-                                />
-                            </View>
-                        <Label style={styles.labelText}>Ende</Label>
-                            <View style={{flex: 1, flexDirection: 'row', paddingBottom: 20, justifyContent: 'space-between'}}>
-                                <TouchableOpacity onPress={() => this._select(5, '15:30')} style={{ width: 68, borderColor: this.state.colorfive, borderRadius: 6, borderWidth: 1.75}}>
-                                    <Text style={{color: this.state.colorfive, fontSize: 15, lineHeight: 18, fontFamily: 'siemens_global_bold', textAlign: 'center', paddingVertical: 16}}>15:30</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => this._select(6, '16:00')} style={{width: 68, borderColor: this.state.colorsix, borderRadius: 6, borderWidth: 1.75}}>
-                                    <Text style={{color: this.state.colorsix, fontSize: 15, lineHeight: 18, fontFamily: 'siemens_global_bold', textAlign: 'center', paddingVertical: 16}}>16:00</Text>
-                                </TouchableOpacity>
-                                <TouchableOpacity onPress={() => this._select(7, '16:30')} style={{ width: 68, borderColor: this.state.colorseven, borderRadius: 6, borderWidth: 1.75}}>
-                                    <Text style={{color: this.state.colorseven, fontSize: 15, lineHeight: 18, fontFamily: 'siemens_global_bold', textAlign: 'center', paddingVertical: 16}}>16:30</Text>
-                                </TouchableOpacity>
-                                
-                                <DatePicker
-                                    style={{ width: 68, borderColor: this.state.coloreight, borderRadius: 6, borderWidth: 2}}
-                                    mode="time"
-                                    is24Hour={true}
-                                    date={this.state.to2}
-                                    format="HH:mm"
-                                    minDate="2018-07-09"
-                                    maxDate="2018-12-31"
-                                    confirmBtnText="Confirm"
-                                    cancelBtnText="Cancel"
-                                    showIcon={this.state.show2}
-                                    hideText={this.state.show2}
-                                    //color='#009999'
-                                    iconSource={require('./time.png')}
-                                    customStyles={{
-                                        dateIcon: {
-                                            marginTop:9,
-                                            width:25,
-                                            height:25
-                                        },
-                                        dateInput: {
-                                            paddingTop: 10,
-                                            borderWidth: 0,
-                                            //fontWeight: "bold",
-                                            //color: this.state.colorfour,
-                                            
-                                        },
-                                        dateText: {
-                                            color: this.state.coloreight,
-                                            fontFamily: 'siemens_global_bold'
-                                        },
-                                        dateTouchBody: {
-                                            //: '#009999'
-                                        }
-                                    }}
-                                    onDateChange={(datetime) => {this.setState({to2: datetime} && this._select(8, datetime)); this.setState({show2:false})}}
-                                    />
-                            </View>
+                        </View>
+                    <Label style={styles.labelText}>Ende</Label>
+                        <View style={{flex: 1, flexDirection: 'row', paddingBottom: 20, justifyContent: 'space-between'}}>
+                            <TouchableOpacity onPress={() => this._select(5, '15:30')} style={{ width: 68, borderColor: this.state.colorfive, borderRadius: 6, borderWidth: 1.75}}>
+                                <Text style={{color: this.state.colorfive, fontSize: 15, lineHeight: 18, fontFamily: 'siemens_global_bold', textAlign: 'center', paddingVertical: 16}}>15:30</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => this._select(6, '16:00')} style={{width: 68, borderColor: this.state.colorsix, borderRadius: 6, borderWidth: 1.75}}>
+                                <Text style={{color: this.state.colorsix, fontSize: 15, lineHeight: 18, fontFamily: 'siemens_global_bold', textAlign: 'center', paddingVertical: 16}}>16:00</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={() => this._select(7, '16:30')} style={{ width: 68, borderColor: this.state.colorseven, borderRadius: 6, borderWidth: 1.75}}>
+                                <Text style={{color: this.state.colorseven, fontSize: 15, lineHeight: 18, fontFamily: 'siemens_global_bold', textAlign: 'center', paddingVertical: 16}}>16:30</Text>
+                            </TouchableOpacity>
                             
-                        {/* <TouchableOpacity style={styles.buttonContainer} onPress={this._saveAufgabe(this.state.from, this.state.to, this.state.title, this.state.content)}>
-                            <Text style={styles.buttonText}>Aufgabe erstellen</Text>
-                        </TouchableOpacity> */}
-                        <TouchableOpacity style={styles.buttonContainer} disabled={this.state.disabled} onPress={()=> this._saveAufgabe(this.state.from, this.state.to, this.state.title, this.state.content)}>
-                            <Text style={styles.buttonText}>ERSTELLEN</Text>
-                        </TouchableOpacity>
-                    </View>
-                </ScrollView>
-                </ApolloProvider>
-            );
-        
+                            <DatePicker
+                                style={{ width: 68, borderColor: this.state.coloreight, borderRadius: 6, borderWidth: 2}}
+                                mode="time"
+                                is24Hour={true}
+                                date={this.state.to2}
+                                format="HH:mm"
+                                minDate="2018-07-09"
+                                maxDate="2018-12-31"
+                                confirmBtnText="Confirm"
+                                cancelBtnText="Cancel"
+                                showIcon={this.state.show2}
+                                hideText={this.state.show2}
+                                //color='#009999'
+                                iconSource={require('./time.png')}
+                                customStyles={{
+                                    dateIcon: {
+                                        marginTop:9,
+                                        width:25,
+                                        height:25
+                                    },
+                                    dateInput: {
+                                        paddingTop: 10,
+                                        borderWidth: 0,
+                                        //fontWeight: "bold",
+                                        //color: this.state.colorfour,
+                                        
+                                    },
+                                    dateText: {
+                                        color: this.state.coloreight,
+                                        fontFamily: 'siemens_global_bold'
+                                    },
+                                    dateTouchBody: {
+                                        //: '#009999'
+                                    }
+                                }}
+                                onDateChange={(datetime) => {this.setState({to2: datetime} && this._select(8, datetime)); this.setState({show2:false})}}
+                                />
+                        </View>
+                        
+                    {/* <TouchableOpacity style={styles.buttonContainer} onPress={this._saveAufgabe(this.state.from, this.state.to, this.state.title, this.state.content)}>
+                        <Text style={styles.buttonText}>Aufgabe erstellen</Text>
+                    </TouchableOpacity> */}
+                    <TouchableOpacity style={styles.buttonContainer} disabled={this.state.disabled} onPress={()=> this._saveAufgabe(this.state.from, this.state.to, this.state.title, this.state.content)}>
+                        <Text style={styles.buttonText}>ERSTELLEN</Text>
+                    </TouchableOpacity>
+                </View>
+            </ScrollView>
+            </ApolloProvider>
+        );
     }
 }
 
@@ -527,6 +539,7 @@ const styles = StyleSheet.create({
     },
     input: {
         height: 48,
+        width: '100%',
         backgroundColor: '#F1F1F1',
         borderRadius: 6,
         color: '#606060',
@@ -563,4 +576,4 @@ const styles = StyleSheet.create({
 });
 
 //make this component available to the app
-export default AufgabeErstellen;
+export default TagesmeldungAusStörung;

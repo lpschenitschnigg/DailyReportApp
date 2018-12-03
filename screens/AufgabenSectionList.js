@@ -1,6 +1,6 @@
 //import liraries
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, SectionList, ScrollView, RefreshControl, DeviceEventEmitter, TouchableOpacity, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, SectionList, ScrollView, RefreshControl, DeviceEventEmitter, TouchableOpacity, FlatList, ActivityIndicator, AsyncStorage } from 'react-native';
 import { Button, Icon, List, Content } from 'native-base';
 import Moment from 'react-moment';
 import moment from 'moment';
@@ -33,10 +33,24 @@ class AufgabenSectionList extends Component {
             refreshing: false,
             isModalVisible: false,
             loading: false,
-            fixedHash: '9FFKqvr-iOfrwRkr48TCm-xqf6zjWUQqu063E9X3fRek9peiqq-edilVWGhRVMlweHR4',
-            //fixedHash: StoreGlobal({type: 'get', key: 'ok'}),
+            //fixedHash: '9FFKqvr-iOfrwRkr48TCm-xqf6zjWUQqu063E9X3fRek9peiqq-edilVWGhRVMlweHR4',
+            fixedHash: StoreGlobal({type: 'get', key: 'ok'}),
         }
-        console.log("hashhash", this.state.fixedHash);
+        // _retrieveData = async () => {
+        //     try {
+        //         const value = await AsyncStorage.getItem('fixedHash');
+        //         if (value !== null) {
+        //           // We have data!!
+        //           console.log("async value fixedhashhhhhhhhh", value);
+        //           this.setState({fixedHash: value});
+        //           console.log("this is fixedhahhhhhs", fixedHash);
+        //         }
+        //        } catch (error) {
+        //             console.log(error);
+        //        }
+        // }
+        //this._retrieveData();
+        //console.log("hashhash", this.state.fixedHash);
         DeviceEventEmitter.addListener('refresh', (e) => {
             this._onRefresh();
             // setTimeout(function(){
@@ -44,6 +58,25 @@ class AufgabenSectionList extends Component {
             // }, 1000);
             
         });
+    }
+    _setFixedHash(hash) {
+        this.setState({fixedHash: hash});
+        console.log('hope it works', this.state.fixedHash);
+        return hash;
+    }
+    _retrieveData = async () => {
+        try {
+            const value = await AsyncStorage.getItem('fixedHash');
+            if (value !== null) {
+              // We have data!!
+              console.log("async value fixedhashhhhhhhhhhh", value);
+              this.setState({fixedHash: value});
+              console.log("this is fixedhahhhhhs", this.state.fixedHash);
+              this._setFixedHash(value);
+            }
+           } catch (error) {
+                console.log(error);
+           }
     }
     static navigationOptions =({navigation}) => {
         // tabBarIcon: ({tintColor}) => (
@@ -83,7 +116,14 @@ class AufgabenSectionList extends Component {
     _toggleModal = () => {
         this.setState({ isModalVisible: !this.state.isModalVisible });
     }
+    // componentWillUpdate() {
+    //     this._retrieveData();
+    // }
+    // componentDidMount() {
+    //     this._retrieveData();
+    // }
     componentWillMount() {
+        //this._retrieveData();
         var date = new Date().getDate();
         var month = new Date().getMonth()+1;
         var year = new Date().getFullYear();
@@ -141,6 +181,7 @@ class AufgabenSectionList extends Component {
         // //console.log(date);
         // var ddate = new Date() -1;
         // console.log(ddate.toLocaleString());
+        console.log('fixedhash for api', this.state.fixedHash);
         fetch('https://asc.siemens.at/datagate/external/Calendar/search', {
             method: 'POST',
             headers: { 
@@ -156,7 +197,7 @@ class AufgabenSectionList extends Component {
         .then(aufgaben => {
             //this._color(aufgaben);
             this.setState({aufgaben: aufgaben});
-            //console.log(aufgaben);
+            console.log(aufgaben);
         })
         fetch('https://asc.siemens.at/datagate/external/Calendar/search', {
             method: 'POST',
@@ -512,170 +553,250 @@ class AufgabenSectionList extends Component {
                     />
                 );
             }
-            if (this.state.wocheA === moment(new Date()).format('YYYY-MM-DD') || this.state.wocheA === this.state.yesterday) {
-            return ( //https://doc.ebichu.cc/react-native/releases/0.44/docs/sectionlist.html
-                <View style={{flex: 1}}
-                // refreshControl={
-                //     <RefreshControl
-                //         refreshing={this.state.refreshing}
-                //         onRefresh={this._onRefresh}
-                //     />
-                // }
-                >
-                    {/* <ScrollView style={{backgroundColor: '#fff', top: 0, ren}}
-                        refreshControl= {
-                            <RefreshControl
-                            refreshing={this.state.refreshing}
-                            onRefresh={this._onRefresh}
-                        />
-                        }
-                    /> */}
-                        {/* <List
-                        refreshControl={
+            if(this.state.wocheA === moment(new Date()).format('YYYY-MM-DD')) { 
+                return ( //-- nur heute
+                    <View style={{flex: 1}}
+                    // refreshControl={
+                    //     <RefreshControl
+                    //         refreshing={this.state.refreshing}
+                    //         onRefresh={this._onRefresh}
+                    //     />
+                    // }
+                    >
+                        {/* <ScrollView style={{backgroundColor: '#fff', top: 0, ren}}
+                            refreshControl= {
                                 <RefreshControl
-                                    refreshing={this.state.refreshing}
-                                    onRefresh={this._onRefresh}
-                                />
+                                refreshing={this.state.refreshing}
+                                onRefresh={this._onRefresh}
+                            />
                             }
-                            /> */}
-                            
-                        <SectionList
+                        /> */}
+                            {/* <List
                             refreshControl={
+                                    <RefreshControl
+                                        refreshing={this.state.refreshing}
+                                        onRefresh={this._onRefresh}
+                                    />
+                                }
+                                /> */}
+                                
+                            <SectionList
+                                refreshControl={
+                                    <RefreshControl
+                                        refreshing={this.state.refreshing}
+                                        onRefresh={this._onRefresh}
+                                    />
+                                }
+                                style={{backgroundColor: 'white', alignSelf: 'stretch', alignContent: 'stretch', flex: 1}}  
+                                sections={[
+                                    {
+                                        id: 0,
+                                        //key: 0,
+                                        backgroundColor: '#009999',
+                                        color: '#fff',
+                                        title: 'Heute ' + '('+this.state.currDate.substring(8, 10) +"."+ this.state.currDate.substring(5, 7) +"."+  this.state.currDate.substring(0, 4)+')',
+                                        data: this.state.dataT,
+                                    },
+                                    // {
+                                    //     id: 1,
+                                    //     //key: 1,
+                                    //     backgroundColor: '#EAEAEA',
+                                    //     color: '#505050',
+                                    //     title: 'Gestern ' + '('+this.state.yesterday.substring(8, 10) +"."+ this.state.yesterday.substring(5, 7) +"."+  this.state.yesterday.substring(0, 4)+')',
+                                    //     data: this.state.dataY,
+                                    // },
+                                    // {
+                                    //     id: 2,
+                                    //     //key: 2,
+                                    //     backgroundColor: '#EAEAEA',
+                                    //     color: '#505050',
+                                    //     title: 'Diese Woche ' + '('+this.state.wocheA.substring(8, 10) +"."+ this.state.wocheA.substring(5, 7) +"."+  this.state.wocheA.substring(0, 4) + ' bis ' + this.state.wocheE.substring(8, 10) +"."+ this.state.wocheE.substring(5, 7) +"."+  this.state.wocheE.substring(0, 4) + ')',
+                                    //     data: this.state.dataW,
+                                    // },
+                                ]}
+                                renderItem={this.renderItem}
+                                renderSectionHeader={({section}) => <Text style={{backgroundColor: section.backgroundColor, color: section.color, height: 38, width: '100%', fontSize: 14, lineHeight: 24, fontFamily: 'siemens_global_bold', paddingLeft: 16, paddingVertical: 7}}>{section.title}</Text>}
+                                //keyExtractor={extractKey}
+                            />
+                        {/* </Content> */}
+                        {/* </ScrollView> */}
+                        <Button style={styles.button} onPress={() => this.props.navigation.navigate('AufgabeErstellenNeu', {aufgaben: this.state.aufgaben})}> 
+                            <Icon active name="add" style={{color:'white', fontSize: 30}}/> 
+                        </Button>
+                        <Modal isVisible={this.state.isModalVisible}>
+                            <Text>Wollen Sie wirklich ausgeloggt werden?</Text>
+                            <TouchableOpacity onPress={() =>this.props.navigate.goBack()}>
+                                <Text>Ja</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={this._toggleModal}>
+                                <Text>Nein</Text>
+                            </TouchableOpacity>
+                        </Modal>
+                    </View>
+                );
+            } else if (this.state.wocheA === moment(new Date()).format('YYYY-MM-DD') || this.state.wocheA === this.state.yesterday) {
+                return ( //https://doc.ebichu.cc/react-native/releases/0.44/docs/sectionlist.html // -- heute und gestern
+                    <View style={{flex: 1}}
+                    // refreshControl={
+                    //     <RefreshControl
+                    //         refreshing={this.state.refreshing}
+                    //         onRefresh={this._onRefresh}
+                    //     />
+                    // }
+                    >
+                        {/* <ScrollView style={{backgroundColor: '#fff', top: 0, ren}}
+                            refreshControl= {
                                 <RefreshControl
-                                    refreshing={this.state.refreshing}
-                                    onRefresh={this._onRefresh}
-                                />
+                                refreshing={this.state.refreshing}
+                                onRefresh={this._onRefresh}
+                            />
                             }
-                            style={{backgroundColor: 'white', alignSelf: 'stretch', alignContent: 'stretch', flex: 1}}  
-                            sections={[
-                                {
-                                    id: 0,
-                                    //key: 0,
-                                    backgroundColor: '#009999',
-                                    color: '#fff',
-                                    title: 'Heute ' + '('+this.state.currDate.substring(8, 10) +"."+ this.state.currDate.substring(5, 7) +"."+  this.state.currDate.substring(0, 4)+')',
-                                    data: this.state.dataT,
-                                },
-                                {
-                                    id: 1,
-                                    //key: 1,
-                                    backgroundColor: '#EAEAEA',
-                                    color: '#505050',
-                                    title: 'Gestern ' + '('+this.state.yesterday.substring(8, 10) +"."+ this.state.yesterday.substring(5, 7) +"."+  this.state.yesterday.substring(0, 4)+')',
-                                    data: this.state.dataY,
-                                },
-                                // {
-                                //     id: 2,
-                                //     //key: 2,
-                                //     backgroundColor: '#EAEAEA',
-                                //     color: '#505050',
-                                //     title: 'Diese Woche ' + '('+this.state.wocheA.substring(8, 10) +"."+ this.state.wocheA.substring(5, 7) +"."+  this.state.wocheA.substring(0, 4) + ' bis ' + this.state.wocheE.substring(8, 10) +"."+ this.state.wocheE.substring(5, 7) +"."+  this.state.wocheE.substring(0, 4) + ')',
-                                //     data: this.state.dataW,
-                                // },
-                            ]}
-                            renderItem={this.renderItem}
-                            renderSectionHeader={({section}) => <Text style={{backgroundColor: section.backgroundColor, color: section.color, height: 38, width: '100%', fontSize: 14, lineHeight: 24, fontFamily: 'siemens_global_bold', paddingLeft: 16, paddingVertical: 7}}>{section.title}</Text>}
-                            //keyExtractor={extractKey}
-                        />
-                    {/* </Content> */}
-                    {/* </ScrollView> */}
-                    <Button style={styles.button} onPress={() => this.props.navigation.navigate('AufgabeErstellenNeu', {aufgaben: this.state.aufgaben})}> 
-                        <Icon active name="add" style={{color:'white', fontSize: 30}}/> 
-                    </Button>
-                    <Modal isVisible={this.state.isModalVisible}>
-                        <Text>Wollen Sie wirklich ausgeloggt werden?</Text>
-                        <TouchableOpacity onPress={() =>this.props.navigate.goBack()}>
-                            <Text>Ja</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={this._toggleModal}>
-                            <Text>Nein</Text>
-                        </TouchableOpacity>
-                    </Modal>
-                </View>
-            );
-        } else {
-            return ( //https://doc.ebichu.cc/react-native/releases/0.44/docs/sectionlist.html
-                <View style={{flex: 1}}
-                // refreshControl={
-                //     <RefreshControl
-                //         refreshing={this.state.refreshing}
-                //         onRefresh={this._onRefresh}
-                //     />
-                // }
-                >
-                    {/* <ScrollView style={{backgroundColor: '#fff', top: 0, ren}}
-                        refreshControl= {
-                            <RefreshControl
-                            refreshing={this.state.refreshing}
-                            onRefresh={this._onRefresh}
-                        />
-                        }
-                    /> */}
-                        {/* <List
-                        refreshControl={
-                                <RefreshControl
-                                    refreshing={this.state.refreshing}
-                                    onRefresh={this._onRefresh}
-                                />
-                            }
-                            /> */}
-                            
-                        <SectionList
+                        /> */}
+                            {/* <List
                             refreshControl={
+                                    <RefreshControl
+                                        refreshing={this.state.refreshing}
+                                        onRefresh={this._onRefresh}
+                                    />
+                                }
+                                /> */}
+                                
+                            <SectionList
+                                refreshControl={
+                                    <RefreshControl
+                                        refreshing={this.state.refreshing}
+                                        onRefresh={this._onRefresh}
+                                    />
+                                }
+                                style={{backgroundColor: 'white', alignSelf: 'stretch', alignContent: 'stretch', flex: 1}}  
+                                sections={[
+                                    {
+                                        id: 0,
+                                        //key: 0,
+                                        backgroundColor: '#009999',
+                                        color: '#fff',
+                                        title: 'Heute ' + '('+this.state.currDate.substring(8, 10) +"."+ this.state.currDate.substring(5, 7) +"."+  this.state.currDate.substring(0, 4)+')',
+                                        data: this.state.dataT,
+                                    },
+                                    {
+                                        id: 1,
+                                        //key: 1,
+                                        backgroundColor: '#EAEAEA',
+                                        color: '#505050',
+                                        title: 'Gestern ' + '('+this.state.yesterday.substring(8, 10) +"."+ this.state.yesterday.substring(5, 7) +"."+  this.state.yesterday.substring(0, 4)+')',
+                                        data: this.state.dataY,
+                                    },
+                                    // {
+                                    //     id: 2,
+                                    //     //key: 2,
+                                    //     backgroundColor: '#EAEAEA',
+                                    //     color: '#505050',
+                                    //     title: 'Diese Woche ' + '('+this.state.wocheA.substring(8, 10) +"."+ this.state.wocheA.substring(5, 7) +"."+  this.state.wocheA.substring(0, 4) + ' bis ' + this.state.wocheE.substring(8, 10) +"."+ this.state.wocheE.substring(5, 7) +"."+  this.state.wocheE.substring(0, 4) + ')',
+                                    //     data: this.state.dataW,
+                                    // },
+                                ]}
+                                renderItem={this.renderItem}
+                                renderSectionHeader={({section}) => <Text style={{backgroundColor: section.backgroundColor, color: section.color, height: 38, width: '100%', fontSize: 14, lineHeight: 24, fontFamily: 'siemens_global_bold', paddingLeft: 16, paddingVertical: 7}}>{section.title}</Text>}
+                                //keyExtractor={extractKey}
+                            />
+                        {/* </Content> */}
+                        {/* </ScrollView> */}
+                        <Button style={styles.button} onPress={() => this.props.navigation.navigate('AufgabeErstellenNeu', {aufgaben: this.state.aufgaben})}> 
+                            <Icon active name="add" style={{color:'white', fontSize: 30}}/> 
+                        </Button>
+                        <Modal isVisible={this.state.isModalVisible}>
+                            <Text>Wollen Sie wirklich ausgeloggt werden?</Text>
+                            <TouchableOpacity onPress={() =>this.props.navigate.goBack()}>
+                                <Text>Ja</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={this._toggleModal}>
+                                <Text>Nein</Text>
+                            </TouchableOpacity>
+                        </Modal>
+                    </View>
+                );
+            } else {
+                return ( //https://doc.ebichu.cc/react-native/releases/0.44/docs/sectionlist.html  // -- heute, gestern, diese woche
+                    <View style={{flex: 1}}
+                    // refreshControl={
+                    //     <RefreshControl
+                    //         refreshing={this.state.refreshing}
+                    //         onRefresh={this._onRefresh}
+                    //     />
+                    // }
+                    >
+                        {/* <ScrollView style={{backgroundColor: '#fff', top: 0, ren}}
+                            refreshControl= {
                                 <RefreshControl
-                                    refreshing={this.state.refreshing}
-                                    onRefresh={this._onRefresh}
-                                />
+                                refreshing={this.state.refreshing}
+                                onRefresh={this._onRefresh}
+                            />
                             }
-                            style={{backgroundColor: 'white', alignSelf: 'stretch', alignContent: 'stretch', flex: 1}}  
-                            sections={[
-                                {
-                                    id: 0,
-                                    //key: 0,
-                                    backgroundColor: '#009999',
-                                    color: '#fff',
-                                    title: 'Heute ' + '('+this.state.currDate.substring(8, 10) +"."+ this.state.currDate.substring(5, 7) +"."+  this.state.currDate.substring(0, 4)+')',
-                                    data: this.state.dataT,
-                                },
-                                {
-                                    id: 1,
-                                    //key: 1,
-                                    backgroundColor: '#EAEAEA',
-                                    color: '#505050',
-                                    title: 'Gestern ' + '('+this.state.yesterday.substring(8, 10) +"."+ this.state.yesterday.substring(5, 7) +"."+  this.state.yesterday.substring(0, 4)+')',
-                                    data: this.state.dataY,
-                                },
-                                {
-                                    id: 2,
-                                    //key: 2,
-                                    backgroundColor: '#EAEAEA',
-                                    color: '#505050',
-                                    title: 'Diese Woche ' + '('+this.state.wocheA.substring(8, 10) +"."+ this.state.wocheA.substring(5, 7) +"."+  this.state.wocheA.substring(0, 4) + ' bis ' + this.state.wocheE.substring(8, 10) +"."+ this.state.wocheE.substring(5, 7) +"."+  this.state.wocheE.substring(0, 4) + ')',
-                                    data: this.state.dataW,
-                                },
-                            ]}
-                            renderItem={this.renderItem}
-                            renderSectionHeader={({section}) => <Text style={{backgroundColor: section.backgroundColor, color: section.color, height: 38, width: '100%', fontSize: 14, lineHeight: 24, fontFamily: 'siemens_global_bold', paddingLeft: 16, paddingVertical: 7}}>{section.title}</Text>}
-                            //keyExtractor={extractKey}
-                        />
-                    {/* </Content> */}
-                    {/* </ScrollView> */}
-                    <Button style={styles.button} onPress={() => this.props.navigation.navigate('AufgabeErstellenNeu', {aufgaben: this.state.aufgaben})}> 
-                        <Icon active name="add" style={{color:'white', fontSize: 30}}/> 
-                    </Button>
-                    <Modal isVisible={this.state.isModalVisible}>
-                        <Text>Wollen Sie wirklich ausgeloggt werden?</Text>
-                        <TouchableOpacity onPress={() =>this.props.navigate.goBack()}>
-                            <Text>Ja</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={this._toggleModal}>
-                            <Text>Nein</Text>
-                        </TouchableOpacity>
-                    </Modal>
-                </View>
-            );
-        }
-        
+                        /> */}
+                            {/* <List
+                            refreshControl={
+                                    <RefreshControl
+                                        refreshing={this.state.refreshing}
+                                        onRefresh={this._onRefresh}
+                                    />
+                                }
+                                /> */}
+                                
+                            <SectionList
+                                refreshControl={
+                                    <RefreshControl
+                                        refreshing={this.state.refreshing}
+                                        onRefresh={this._onRefresh}
+                                    />
+                                }
+                                style={{backgroundColor: 'white', alignSelf: 'stretch', alignContent: 'stretch', flex: 1}}  
+                                sections={[
+                                    {
+                                        id: 0,
+                                        //key: 0,
+                                        backgroundColor: '#009999',
+                                        color: '#fff',
+                                        title: 'Heute ' + '('+this.state.currDate.substring(8, 10) +"."+ this.state.currDate.substring(5, 7) +"."+  this.state.currDate.substring(0, 4)+')',
+                                        data: this.state.dataT,
+                                    },
+                                    {
+                                        id: 1,
+                                        //key: 1,
+                                        backgroundColor: '#EAEAEA',
+                                        color: '#505050',
+                                        title: 'Gestern ' + '('+this.state.yesterday.substring(8, 10) +"."+ this.state.yesterday.substring(5, 7) +"."+  this.state.yesterday.substring(0, 4)+')',
+                                        data: this.state.dataY,
+                                    },
+                                    {
+                                        id: 2,
+                                        //key: 2,
+                                        backgroundColor: '#EAEAEA',
+                                        color: '#505050',
+                                        title: 'Diese Woche ' + '('+this.state.wocheA.substring(8, 10) +"."+ this.state.wocheA.substring(5, 7) +"."+  this.state.wocheA.substring(0, 4) + ' bis ' + this.state.wocheE.substring(8, 10) +"."+ this.state.wocheE.substring(5, 7) +"."+  this.state.wocheE.substring(0, 4) + ')',
+                                        data: this.state.dataW,
+                                    },
+                                ]}
+                                renderItem={this.renderItem}
+                                renderSectionHeader={({section}) => <Text style={{backgroundColor: section.backgroundColor, color: section.color, height: 38, width: '100%', fontSize: 14, lineHeight: 24, fontFamily: 'siemens_global_bold', paddingLeft: 16, paddingVertical: 7}}>{section.title}</Text>}
+                                //keyExtractor={extractKey}
+                            />
+                        {/* </Content> */}
+                        {/* </ScrollView> */}
+                        <Button style={styles.button} onPress={() => this.props.navigation.navigate('AufgabeErstellenNeu', {aufgaben: this.state.aufgaben})}> 
+                            <Icon active name="add" style={{color:'white', fontSize: 30}}/> 
+                        </Button>
+                        <Modal isVisible={this.state.isModalVisible}>
+                            <Text>Wollen Sie wirklich ausgeloggt werden?</Text>
+                            <TouchableOpacity onPress={() =>this.props.navigate.goBack()}>
+                                <Text>Ja</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity onPress={this._toggleModal}>
+                                <Text>Nein</Text>
+                            </TouchableOpacity>
+                        </Modal>
+                    </View>
+                );
+            }
     }
 }
 

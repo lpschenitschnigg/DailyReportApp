@@ -6,6 +6,7 @@ import { createBottomTabNavigator, createStackNavigator } from 'react-navigation
 import AgendaScreen from './AgendaScreen';
 import Störungen from './Störungen';
 import AufgabenSectionList from './AufgabenSectionList';
+import TaskScreen from './TaskScreen';
 
 // create a component
 
@@ -31,6 +32,9 @@ const StackAufgaben = createStackNavigator({
 })
 const StackStörungen = createStackNavigator({
     Störungen: {screen: Störungen}
+})
+const StackTasks = createStackNavigator({
+    TaskScreen: {screen: TaskScreen}
 })
 const AppTabNavigator = createBottomTabNavigator({
     Agenda: {screen: StackAgenda,
@@ -93,9 +97,25 @@ const AppTabNavigator = createBottomTabNavigator({
             )
         }
     },
+    Tasks: {screen: StackTasks,
+        navigationOptions: {
+            tabBarOptions: {
+                activeTintColor: '#009999',
+                inactiveTintColor: 'grey',
+                style: {
+                    height: 60,
+                    paddingBottom:7,
+                    paddingTop: 7
+                }
+            },
+            tabBarIcon:({tintColor})=> (
+                <Icon name="md-list" style={{color: tintColor}} size={24}/> 
+            )
+        }
+    },
 },{
     initialRouteName:'Statusmeldung',
-    order:['Agenda', 'Statusmeldung', 'Störungen'],
+    order:['Agenda', 'Tasks', 'Statusmeldung', 'Störungen'],
     tabBarOptions: {
         activeTintColor: '#009999',
         // activeBackgroundColor: 'red',

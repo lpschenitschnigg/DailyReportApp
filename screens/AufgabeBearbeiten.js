@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, ToastA
 import moment from 'moment';
 import DatePicker from 'react-native-datepicker'; // https://github.com/xgfe/react-native-datepicker
 import { Label, Toast } from 'native-base';
+import {StoreGlobal} from './WelcomeScreen';
 //import DateTimePicker from 'react-native-modal-datetime-picker';
 
 // create a component
@@ -19,6 +20,7 @@ class AufgabeBearbeiten extends Component {
             showToast: true,
             //isDateTimePickerVisible: false,
             type: this.props.navigation.state.params.type,
+            fixedHash: StoreGlobal({type: 'get', key: 'ok'}),
         };
     }
     static navigationOptions = {
@@ -48,7 +50,7 @@ class AufgabeBearbeiten extends Component {
                     'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                    "fixedHash":"9FFKqvr-iOfrwRkr48TCm-xqf6zjWUQqu063E9X3fRek9peiqq-edilVWGhRVMlweHR4",
+                    "fixedHash": this.state.fixedHash,
                     "from": f,
                     "to": t,
                     'title': title,

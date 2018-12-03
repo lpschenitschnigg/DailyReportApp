@@ -4,6 +4,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { Calendar, CalendarList, Agenda } from 'react-native-calendars';
 import {LocaleConfig} from 'react-native-calendars';
 import moment from 'moment';
+import {StoreGlobal} from './WelcomeScreen';
 
 LocaleConfig.locales['de'] = {
     monthNames: ['Jänner','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'],
@@ -25,6 +26,7 @@ class AgendaComponent extends Component {
           currentDate: '',
           aufgaben: [],
           refreshing: false,
+          fixedHash: StoreGlobal({type: 'get', key: 'ok'}),
         };
       }
     _currDate() {
@@ -43,7 +45,7 @@ class AgendaComponent extends Component {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          "fixedHash":"9FFKqvr-iOfrwRkr48TCm-xqf6zjWUQqu063E9X3fRek9peiqq-edilVWGhRVMlweHR4",
+          "fixedHash": this.state.fixedHash,
           "from": '2018-10-01T00:00:00+01:00',
           "to":"2018-12-31T23:59:59+01:00",
         }),
@@ -65,7 +67,7 @@ class AgendaComponent extends Component {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          "fixedHash":"9FFKqvr-iOfrwRkr48TCm-xqf6zjWUQqu063E9X3fRek9peiqq-edilVWGhRVMlweHR4",
+          "fixedHash": this.state.fixedHash,
           "from": '2018-10-01T00:00:00+01:00',
           "to":"2018-12-31T23:59:59+01:00",
         }),

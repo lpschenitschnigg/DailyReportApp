@@ -2,6 +2,7 @@
 import React, { Component } from 'react';
 import { View, Text, StyleSheet, FlatList, RefreshControl, ToastAndroid, TextInput, TouchableOpacity, ScrollView } from 'react-native';
 import { Label } from 'native-base';
+import {StoreGlobal} from './WelcomeScreen';
 
 // create a component
 class LogScreen extends Component {
@@ -13,12 +14,13 @@ class LogScreen extends Component {
             currDate: '',
             refreshing: false,
             infoText: '',
+            fixedHash: StoreGlobal({type: 'get', key: 'ok'}),
         }
         fetch('https://asc.siemens.at/datagate/external/mobileticket/logForTicket/'+ this.state.number, {
             method: 'GET',
             headers: { 
               'Content-Type': 'application/json',
-              'userhash': '9FFKqvr-iOfrwRkr48TCm-xqf6zjWUQqu063E9X3fRek9peiqq-edilVWGhRVMlweHR4'
+              'userhash': this.state.fixedHash
             },
             // body: JSON.stringify({
             //   "fixedHash":"hKjxQjF7-h4mffXGYvX8QytA5b7q3BqkGcJ92Y-FQkLk28FSF8Z0OIybGXVGfmcBeHR4",
@@ -50,7 +52,7 @@ class LogScreen extends Component {
             method: 'GET',
             headers: { 
               'Content-Type': 'application/json',
-              'userhash': '9FFKqvr-iOfrwRkr48TCm-xqf6zjWUQqu063E9X3fRek9peiqq-edilVWGhRVMlweHR4'
+              'userhash': this.state.fixedHash
             },
             // body: JSON.stringify({
             //   "fixedHash":"hKjxQjF7-h4mffXGYvX8QytA5b7q3BqkGcJ92Y-FQkLk28FSF8Z0OIybGXVGfmcBeHR4",
@@ -75,7 +77,7 @@ class LogScreen extends Component {
             method: 'POST',
             headers: { 
               'Content-Type': 'application/json',
-              'userhash': '9FFKqvr-iOfrwRkr48TCm-xqf6zjWUQqu063E9X3fRek9peiqq-edilVWGhRVMlweHR4'
+              'userhash': this.state.fixedHash
             },
             'processData': false,
             //'data': "{\"id\":" + this.state.id+",\"event\":4,\"infoText\":\"" + this.state.infoText+ "\"}",

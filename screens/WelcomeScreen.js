@@ -95,6 +95,7 @@ class WelcomeScreen extends Component {
             showToast: false,
             token: '',
             fixedHash: '',
+            disabled: false,
           };
     }
     static token;
@@ -114,7 +115,7 @@ class WelcomeScreen extends Component {
             //console.log(dataQuery);
             let trigger = false;
             dataQuery.forEach(element => {
-                if (this.state.token == element.token) {
+                if (this.state.token === element.token) {
                     console.log("Same!");
                     trigger = true;
                 }
@@ -157,6 +158,7 @@ class WelcomeScreen extends Component {
         })
         .then(response => (response.json()))
         .then((responseData) => {
+            this.setState({disabled: true});
             this._storeData(responseData.fixedHash);
             console.log(responseData);   
             this._sendToServer(name);    
@@ -183,6 +185,7 @@ class WelcomeScreen extends Component {
         //     text: 'Sie wurden erfolgreich eingeloggt',
         //     type: 'success',
         // })
+        this.setState({disabled: false});
         }).catch((error) => {
             console.log(error);
             //Alert.alert('Unvalid username/password', 'Bitte versuchen Sie es erneut')
@@ -207,7 +210,8 @@ class WelcomeScreen extends Component {
             const value = await AsyncStorage.getItem('fixedHash');
             if (value !== null) {
               // We have data!!
-              console.log(value);
+              console.log("async value fixedhash", value);
+              StoreGlobal({type: 'set', key:'ok', value: value}); // <--- zum speichern des fixedHash global für die Requests
               this.props.navigation.navigate('TabNavigator');
             }
            } catch (error) {
@@ -282,7 +286,7 @@ class WelcomeScreen extends Component {
                                         ref={"txtPassword"}
                                         onChangeText={(text)=> this.setState({password: text})}
                                     />
-                                    <TouchableOpacity style={styles.buttonContainer} onPress={()=> this._login(this.state.name, this.state.password)}>
+                                    <TouchableOpacity style={styles.buttonContainer} disabled={this.state.disabled} onPress={()=> this._login(this.state.name, this.state.password)}>
                                         <Text style={styles.buttonText}>EINLOGGEN</Text>
                                     </TouchableOpacity>
                                 </View>

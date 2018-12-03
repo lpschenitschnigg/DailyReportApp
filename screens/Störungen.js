@@ -4,6 +4,7 @@ import { Container, Header, Content, Button, Icon, List, ListItem, Text, Left, T
 import { DrawerNavigator, DrawerItems } from "react-navigation";
 // import {Icon} from 'react-native-vector-icons';
 import Modal from 'react-native-modal';
+import {StoreGlobal} from './WelcomeScreen';
 
 // create a component
 class Störungen extends Component {
@@ -43,11 +44,15 @@ class Störungen extends Component {
         super(props)
         this.state = {
             störungen: [],
+            aufgaben: [],
             basic : true,
             //listViewData: [],
             AnfrageStörungen: [],
             refreshing: false,
             isModalVisible: false,
+            fixedHash: StoreGlobal({type: 'get', key: 'ok'}),
+            ticketNumber: '',
+            infoText: '',
         }
         DeviceEventEmitter.addListener('refresh', (e) => {
             this._onRefresh();
@@ -108,11 +113,28 @@ class Störungen extends Component {
     }
     _onRefresh = () => {
         this.setState({refreshing: true});
+        fetch('https://asc.siemens.at/datagate/external/Calendar/search', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                "fixedHash": this.state.fixedHash,
+                "from": '2018-09-01T00:00:00+02:00',
+                "to": '2018-12-31T23:59:59+02:00',
+            }),
+        })
+        .then(response => (response.json()))
+        .then(aufgaben => {
+            //this._color(aufgaben);
+            this.setState({aufgaben: aufgaben});
+            //console.log(aufgaben);
+        })
         fetch('https://asc.siemens.at/datagate/external/mobileticket/myTickets', {
             method: 'GET',
             headers: { 
               'Content-Type': 'application/json',
-              'userhash': '9FFKqvr-iOfrwRkr48TCm-xqf6zjWUQqu063E9X3fRek9peiqq-edilVWGhRVMlweHR4'
+              'userhash': this.state.fixedHash
             },
             // body: JSON.stringify({
             //   "fixedHash":"hKjxQjF7-h4mffXGYvX8QytA5b7q3BqkGcJ92Y-FQkLk28FSF8Z0OIybGXVGfmcBeHR4",
@@ -187,6 +209,126 @@ class Störungen extends Component {
     _toggleModal = () => {
         this.setState({ isModalVisible: !this.state.isModalVisible });
     }
+    _ticketAccept(id) {
+        fetch('https://asc.siemens.at/datagate/external/mobileticket/update', {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+              'userhash': this.state.fixedHash
+            },
+            'processData': false,
+            //'data': "{\"id\":" + this.state.id+",\"event\":4,\"infoText\":\"" + this.state.infoText+ "\"}",
+            body: JSON.stringify({
+              "id": id,
+              "event": 0,
+              "infoText": 'Angenommen',
+            }),
+        })
+        .then(response => (response.json()))
+        .then(response => {
+            console.log(response);
+            this._onRefresh();
+        }).catch((error) => {
+            console.error(error);
+            ToastAndroid.showWithGravity("Fehler", ToastAndroid.LONG, ToastAndroid.BOTTOM);
+        });
+    }
+    _ticketRejectNoTime(id,) {
+        fetch('https://asc.siemens.at/datagate/external/mobileticket/update', {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+              'userhash': this.state.fixedHash
+            },
+            'processData': false,
+            //'data': "{\"id\":" + this.state.id+",\"event\":4,\"infoText\":\"" + this.state.infoText+ "\"}",
+            body: JSON.stringify({
+              "id": id,
+              "event": 1,
+              "infoText": 'Keine Zeit',
+            }),
+        })
+        .then(response => (response.json()))
+        .then(response => {
+            console.log(response);
+            this._onRefresh();
+        }).catch((error) => {
+            console.error(error);
+            ToastAndroid.showWithGravity("Fehler", ToastAndroid.LONG, ToastAndroid.BOTTOM);
+        });
+    }
+    _ticketRejectWrongPerson(id) {
+        fetch('https://asc.siemens.at/datagate/external/mobileticket/update', {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+              'userhash': this.state.fixedHash
+            },
+            'processData': false,
+            //'data': "{\"id\":" + this.state.id+",\"event\":4,\"infoText\":\"" + this.state.infoText+ "\"}",
+            body: JSON.stringify({
+              "id": id,
+              "event": 2,
+              "infoText": 'Falsche Person',
+            }),
+        })
+        .then(response => (response.json()))
+        .then(response => {
+            console.log(response);
+            this._onRefresh();
+        }).catch((error) => {
+            console.error(error);
+            ToastAndroid.showWithGravity("Fehler", ToastAndroid.LONG, ToastAndroid.BOTTOM);
+        });
+    }
+    _ticketPassBack(id) {
+        fetch('https://asc.siemens.at/datagate/external/mobileticket/update', {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+              'userhash': this.state.fixedHash
+            },
+            'processData': false,
+            //'data': "{\"id\":" + this.state.id+",\"event\":4,\"infoText\":\"" + this.state.infoText+ "\"}",
+            body: JSON.stringify({
+              "id": id,
+              "event": 3,
+              "infoText": 'Anderer Grund',
+            }),
+        })
+        .then(response => (response.json()))
+        .then(response => {
+            console.log(response);
+            this._onRefresh();
+        }).catch((error) => {
+            console.error(error);
+            ToastAndroid.showWithGravity("Fehler", ToastAndroid.LONG, ToastAndroid.BOTTOM);
+        });
+    }
+    _ticketSolved(id) {
+        fetch('https://asc.siemens.at/datagate/external/mobileticket/update', {
+            method: 'POST',
+            headers: { 
+              'Content-Type': 'application/json',
+              'userhash': this.state.fixedHash
+            },
+            'processData': false,
+            //'data': "{\"id\":" + this.state.id+",\"event\":4,\"infoText\":\"" + this.state.infoText+ "\"}",
+            body: JSON.stringify({
+              "id": id,
+              "event": 6,
+              "infoText": 'Erledigt',
+            }),
+        })
+        .then(response => (response.json()))
+        .then(response => {
+            console.log(response);
+            this._onRefresh();
+        }).catch((error) => {
+            console.error(error);
+            ToastAndroid.showWithGravity("Fehler", ToastAndroid.LONG, ToastAndroid.BOTTOM);
+        });
+    }
     renderItem = ({item}) => {
         if (item.accepted === false) {
             return (
@@ -198,7 +340,7 @@ class Störungen extends Component {
                         </View>
                     <View></View>
                     <View style={{justifyContent: "space-between", flexDirection: 'row', paddingBottom: 10, paddingLeft:18, paddingRight:18}}>
-                        <TouchableOpacity style={{height: 35, justifyContent: 'center', borderWidth: 2, borderColor: '#009999', borderRadius: 6, alignSelf: 'center'}}>
+                        <TouchableOpacity onPress={() => this._ticketAccept(item.id)} style={{height: 35, justifyContent: 'center', borderWidth: 2, borderColor: '#009999', borderRadius: 6, alignSelf: 'center'}}>
                             <View style={{flex:1,flexDirection: 'row',justifyContent: 'center', alignItems: 'center'}}><Icon name='md-thumbs-up' style={{color: '#009999', marginLeft:7,fontSize:19}}></Icon><Text style={styles.labelBtn}>Annehmen</Text></View>
                         </TouchableOpacity>
                         <TouchableOpacity onPress={()=> this.props.navigation.navigate('LogScreen', {ticketNumber: item.number})} style={{height: 35, justifyContent: 'center', borderWidth: 2, borderColor: '#009999', borderRadius: 6, alignSelf: 'center'}}>
@@ -221,13 +363,13 @@ class Störungen extends Component {
                                     <Text style={{backgroundColor: '#009999', color: '#fff', fontSize: 18, padding: 5, marginBottom: 10}}>Grund angeben</Text>
                                 </View>
                                 <View style={{ flex: 1, justifyContent: 'space-around', flexDirection: 'column'}}>
-                                    <TouchableOpacity onPress={this._toggleModal} style={{ borderWidth: 2, borderColor: '#009999', borderRadius: 6, marginBottom: 15, padding: 5}}>
+                                    <TouchableOpacity onPress={() => this._ticketRejectNoTime(item.id) && this._toggleModal} style={{ borderWidth: 2, borderColor: '#009999', borderRadius: 6, marginBottom: 15, padding: 5}}>
                                         <Text>Keine Zeit</Text>
                                     </TouchableOpacity>
-                                    <TouchableOpacity onPress={this._toggleModal} style={{borderWidth: 2, borderColor: '#009999', borderRadius: 6, marginBottom: 15, padding: 5}}>
+                                    <TouchableOpacity onPress={() => this._ticketRejectWrongPerson(item.id) && this._toggleModal} style={{borderWidth: 2, borderColor: '#009999', borderRadius: 6, marginBottom: 15, padding: 5}}>
                                         <Text>Falsche Person</Text>
                                     </TouchableOpacity>
-                                    <TouchableOpacity onPress={this._toggleModal} style={{borderWidth: 2, borderColor: '#009999', borderRadius: 6, marginBottom: 15, padding: 5}}>
+                                    <TouchableOpacity onPress={() => this._ticketPassBack(item.id) && this._toggleModal} style={{borderWidth: 2, borderColor: '#009999', borderRadius: 6, marginBottom: 15, padding: 5}}>
                                         <Text>Anderer Grund</Text>
                                     </TouchableOpacity>
                                 </View>
@@ -246,7 +388,7 @@ class Störungen extends Component {
                         </View>
                     <View></View>
                     <View style={{justifyContent: "space-between", flexDirection: 'row', paddingBottom: 10,paddingLeft:18, paddingRight:18}}>
-                        <TouchableOpacity style={{height: 35, justifyContent: 'center', borderWidth: 2, borderColor: '#009999', borderRadius: 6, alignSelf: 'center'}}>
+                        <TouchableOpacity onPress={() => this.props.navigation.navigate('TagesmeldungAusStörung', {title: item.information, content: item.name + " " + item.number, id: item.id, aufgaben: this.state.aufgaben})} style={{height: 35, justifyContent: 'center', borderWidth: 2, borderColor: '#009999', borderRadius: 6, alignSelf: 'center'}}>
                             <View style={{flex:1,flexDirection: 'row',justifyContent: 'center', alignItems: 'center'}}><Icon name='md-checkmark' style={{color: '#009999', marginLeft:7,fontSize:21}}></Icon><Text style={styles.labelBtn}>Erledigt</Text></View>
                         </TouchableOpacity>
                         {/* <TouchableOpacity onPress={()=> this.props.navigation.navigate('LogUpdate', {id: item.number})}style={{backgroundColor: '#a5a5a5', width: 50, height: 30}}>

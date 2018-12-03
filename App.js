@@ -30,6 +30,10 @@ import TabNavigator from './screens/TabNavigator';
 import LogScreen from './screens/LogScreen';
 import AufgabeErstellenNeu from './screens/AufgabenErstellenNeu';
 import ModalScreen from './screens/ModalScreen';
+import TagesmeldungAusTask from './screens/TagesmeldungAusTask';
+import TagesmeldungAusStörung from './screens/TagesmeldungAusStörung';
+import Kundenauswahl from './screens/Kundenauswahl';
+import Types from './screens/Types';
 
 // async function register() {
 //   const {status} = await Expo.Permissions.askAsync(
@@ -54,12 +58,12 @@ export default class App extends React.Component {
   static token;
   componentDidMount() {
       // this.registerForPushNotificationAsync();
-      // if (Platform.OS === 'android') {
-      //   Expo.Notifications.createChannelAndroidAsync('tagesmeldung', {
-      //     name: 'Tages Meldung',
-      //     sound: true,
-      //   });
-      // }
+      if (Platform.OS === 'android') {
+        Expo.Notifications.createChannelAndroidAsync('tagesmeldung', {
+          name: 'Tages Meldung',
+          sound: true,
+        });
+      }
       // Font.loadAsync({
       //   'siemens_global_roman': require('./assets/fonts/siemens_global_roman.ttf'),
       //   'siemens_global_bold': require('./assets/fonts/siemens_global_bold.ttf'),
@@ -277,8 +281,68 @@ const AppStackNavigator = createStackNavigator({
         height: 75,
         elevation: 0,
       },
-  }),
-},
+    }),
+  },
+  TagesmeldungAusTask: { screen: TagesmeldungAusTask,
+    navigationOptions: () => ({
+      title: 'Tagesmeldung erstellen',
+      headerTitleStyle: {
+        fontSize: 28,
+        lineHeight: 34,
+      },
+      headerTintColor: '#009999',
+      headerStyle: {
+        backgroundColor: '#fff',
+        height: 75,
+        elevation: 0,
+      },
+    }),
+  },
+  TagesmeldungAusStörung: { screen: TagesmeldungAusStörung,
+    navigationOptions: () => ({
+      title: 'Tagesmeldung erstellen',
+      headerTitleStyle: {
+        fontSize: 28,
+        lineHeight: 34,
+      },
+      headerTintColor: '#009999',
+      headerStyle: {
+        backgroundColor: '#fff',
+        height: 75,
+        elevation: 0,
+      },
+    }),
+  },
+  Kundenauswahl: {screen: Kundenauswahl,
+    navigationOptions: () => ({
+      title: 'Kundenauswahl',
+      headerTitleStyle: {
+        fontSize: 28,
+        lineHeight: 34,
+      },
+      headerTintColor: '#009999',
+      headerStyle: {
+        backgroundColor: '#fff',
+        height: 75,
+        elevation: 0,
+      },
+    }),
+  },
+  Types: {screen: Types,
+    navigationOptions: () => ({
+      title: 'Typauswahl',
+      headerTitleStyle: {
+        fontSize: 28,
+        lineHeight: 34,
+      },
+      headerTintColor: '#009999',
+      headerStyle: {
+        backgroundColor: '#fff',
+        height: 75,
+        elevation: 0,
+      },
+    }),
+  },
 })
 
 const styles = StyleSheet.create({
