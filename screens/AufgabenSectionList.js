@@ -491,18 +491,18 @@ class AufgabenSectionList extends Component {
             return (
                 <View>
                     <View style={{paddingLeft: 18, borderBottomWidth: 1, borderBottomColor: '#EEEEEE', backgroundColor: '#fff'}}>
-                        <Text onPress={() => this._detail(item)} style={{fontSize: 16, lineHeight: 24, paddingTop: 9, fontFamily: 'siemens_global_bold'}}>
+                        <Text onPress={() => this._detail(item)} style={{fontSize: 12, lineHeight: 12, paddingTop: 9, fontFamily: 'siemens_global_bold'}}>
+                            
+                        </Text>
+                        <Text onPress={() => this._detail(item)} style={{ fontSize: 16, lineHeight: 24, color: '#505050', fontFamily: 'siemens_global_roman'}}>
                             {item.title}
                         </Text>
-                        <Text onPress={() => this._detail(item)} style={{ fontSize: 12, lineHeight: 12, color: '#505050', fontFamily: 'siemens_global_roman'}}>
-                            {item.type}
-                        </Text>
                         <Text onPress={() => this._detail(item)} style={{ fontSize: 12, lineHeight: 20, color: '#505050', paddingBottom: 13, fontFamily: 'siemens_global_roman'}}>
-                            {item.from.substring(8, 10)}.{item.from.substring(5,7)}.{item.from.substring(0, 4)}
+                            
                         </Text>
                     </View>
                     <View style={{position: 'absolute', right: 20, justifyContent: 'center', alignItems: 'center', top: 27}}>
-                        <Text onPress={() => this._detail(item)} style={{ fontSize: 14, lineHeight: 24, color: '#505050', fontFamily: 'siemens_global_roman'}}>{this._timefunction(item.to, item.from)}</Text>
+                        <Text onPress={() => this._detail(item)} style={{ fontSize: 14, lineHeight: 24, color: '#505050', fontFamily: 'siemens_global_roman'}}></Text>
                     </View>
                 {/* <View style={{borderBottomWidth: 1, borderBottomColor: '#EAEAEA'}}></View> */}
                 </View>

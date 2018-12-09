@@ -1,6 +1,8 @@
 //import liraries
 import React, { Component } from 'react';
-import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, ToastAndroid, DeviceEventEmitter, Button, Picker} from 'react-native';
+import { View, Text, StyleSheet, TextInput, TouchableOpacity, ScrollView, ToastAndroid, DeviceEventEmitter, Button, Picker, FlatList} from 'react-native';
+
+import Modal from 'react-native-modal';
 
 import DatePicker from 'react-native-datepicker'; // https://github.com/xgfe/react-native-datepicker
 import { Label, Toast, Item } from 'native-base';
@@ -49,11 +51,16 @@ class TagesmeldungAusStörung extends Component {
         var toTime = new Date();
         toTime.setHours(toTime.getHours() + 4);
         this.state = {
+            workerid: 'cjooe47t3ko4s0167fvd0aoc3',
+            customerid: '',
+            typid: '',
             from: '',
             to: '',
             title: this.props.navigation.state.params.title,
             id: this.props.navigation.state.params.id,
             content: this.props.navigation.state.params.content,
+            cus: '',
+            typ: '',
             showToast: true,
             //isDateTimePickerVisible: false,
             //cat: this.props.navigation.state.params.cat,
@@ -69,6 +76,7 @@ class TagesmeldungAusStörung extends Component {
             coloreight: '#979797',
             selected: false,
             kunden: [],
+            types: [],
             kunden2: [
                 {
                     city: 'Bregenz',
@@ -96,7 +104,8 @@ class TagesmeldungAusStörung extends Component {
             to2: toTime,
             disabled: false,
             fixedHash: StoreGlobal({type: 'get', key: 'ok'}),
-            //opacity: 1,
+            isModalCustomerVisible: false,
+            isModalTypVisible: false,
             
         };
         // DeviceEventEmitter.addListener('refresh', (e) => {
@@ -138,7 +147,7 @@ class TagesmeldungAusStörung extends Component {
         client.query({
             query: gql`
             {
-                allCustomers {id, name, city, street}
+                allCustomers {id, name, city, street, plz}
             }
             `
         }).then(result => {
@@ -147,8 +156,25 @@ class TagesmeldungAusStörung extends Component {
             console.log(this.state.kunden);
 
         });
+        client.query({
+            query: gql`
+            {
+                allTyps {id, name, color}
+            }
+            `
+        }).then(result => {
+            console.log(result);
+            this.setState({types: result.data.allTyps});
+            console.log(this.state.types);
+
+        });
     }
-    
+    _toggleModalCustomer = () => {
+        this.setState({ isModalCustomerVisible: !this.state.isModalCustomerVisible });
+    }
+    _toggleModalTyp = () => {
+        this.setState({ isModalTypVisible: !this.state.isModalTypVisible });
+    }
     componentDidMount() {
         fetch('https://asc.siemens.at/datagate/external/Calendar/planned', {
             method: 'GET',
@@ -215,7 +241,61 @@ class TagesmeldungAusStörung extends Component {
              .then(response => (response.json()))
              .then((responseData) => {
                  console.log(responseData)
-                 ToastAndroid.showWithGravity("Task erstellt", ToastAndroid.LONG, ToastAndroid.BOTTOM);
+                 ToastAndroid.showWithGravity("Eintrag erstellt", ToastAndroid.LONG, ToastAndroid.BOTTOM);
+                 client.mutate({
+                    variables: { content: this.state.content, from: this.state.from, to: this.state.to, title: this.state.title, customerId: this.state.customerid, typId: this.state.typid, workerId: this.state.workerid},
+                    mutation: gql`
+                        mutation createWorkingOn($content: String, $from: String!, $to: String!, $title: String, $customerId: ID!, $typId: ID!, $workerId: ID!){
+                            createWorkingOn(content: $content, from: $from, to: $to, title: $title, customerId: $customerId, typId: $typId, workerId: $workerId) {
+                                id
+                                content
+                                from
+                                to
+                                title
+                                customer {
+                                    id
+                                    workingOn {
+                                        id
+                                    }
+                                }
+                                typ {
+                                    id
+                                }
+                                worker {
+                                    id
+                                }
+                            }
+                        }
+                    `,
+                }).then((data) => {
+                    console.log(data.data.createWorkingOn.id);
+                    //var workingonid = data.data.createWorkingOn.id;
+                    // mutation { 
+                    //     setWorkingOnCustomer(customerCustomerId: ID!, workingOnWorkingOnId: ID!) {
+                    //         setWorkingOnCustomer(customerCustomerId: $customer)
+                    //     }
+                    // }
+                    // client.mutate({
+                    //     variables: { customer: this.state.customerid, workingonid : workingonid },
+                    //     mutation: gql`
+                    //     mutation { 
+                    //             setWorkingOnCustomer(customerCustomerId: ID!, workingOnWorkingOnId: ID!):
+                    //                 setWorkingOnCustomerPayload(customerCustomerId: $customer, workingOnWorkingOnId: $workingonid) {
+                    //                     customer {
+                    //                         name
+                    //                     }
+                    //                 }
+                    //             }
+                    //         }
+                    //     `,
+                    // }).then((data) => {
+                    //     console.log(data);
+                    // }).catch(error => {
+                    //     console.log(error); 
+                    // })
+                }).catch(error => {
+                    console.log(error); 
+                })
                  DeviceEventEmitter.emit('refresh');
                  this.props.navigation.navigate('Aufgaben' ,{refresh: true});
 
@@ -359,6 +439,16 @@ class TagesmeldungAusStörung extends Component {
             console.log(this.state.to);
         }
     }
+    _choseCustomer(name, city, id) {
+        this.setState({cus: name + ", " + city});
+        this.setState({customerid: id});
+        this._toggleModalCustomer();
+    }
+    _choseTyp(name, id) {
+        this.setState({typ: name});
+        this.setState({typid: id});
+        this._toggleModalTyp();
+    }
     render() {
         if(this.props.loading) return null;
         //const { params } = this.props.navigation.state;
@@ -383,9 +473,9 @@ class TagesmeldungAusStörung extends Component {
                     paddingTop: 10,
                     borderRadius: 10,
                     backgroundColor: '#fff'}}>
-                    <Label style={{paddingTop: 18, fontSize: 18, marginBottom: 10, fontSize: 15, marginBottom: 10, color: '#606060', lineHeight: 18, fontFamily: 'siemens_global_bold'}}>Ort/Kunde</Label>
+                    <Label style={{paddingTop: 18, fontSize: 18, marginBottom: 10, fontSize: 15, marginBottom: 10, color: '#606060', lineHeight: 18, fontFamily: 'siemens_global_bold'}}>Titel</Label>
                         <TextInput style={styles.input} 
-                            placeholder='Ort/Kunde...'
+                            placeholder='Titel...'
                             value={this.state.title}
                             placeholderTextColor='#606060'
                             underlineColorAndroid='#F1F1F1'
@@ -394,6 +484,61 @@ class TagesmeldungAusStörung extends Component {
                             autoCorrect={false}
                             ref={"txtTitle"}
                         />
+                        <TouchableOpacity onPress={this._toggleModalCustomer}><Text>Kunde auswählen</Text></TouchableOpacity>
+                        <Label style={styles.labelText}>Kunde: {this.state.cus}</Label>
+                        <Modal isVisible={this.state.isModalCustomerVisible} onBackButtonPress={this._toggleModalCustomer} onBackdropPress={this._toggleModalCustomer} style={{ backgroundColor: "white", 
+                            padding: 22,
+                            justifyContent: "center",
+                            alignItems: "center",
+                            borderRadius: 4,
+                            borderColor: "rgba(0, 0, 0, 0.1)",
+                            }}>
+                           <View>
+                                <FlatList
+                                    style={{backgroundColor: 'white', alignSelf: 'stretch', alignContent: 'stretch', marginTop: 10}} // https://stackoverflow.com/questions/33297367/100-width-in-react-native-flexbox
+                                    data={this.state.kunden}
+                                    renderItem={({item}) =>
+                                    <View style={{backgroundColor: '#f5f5f5'}}>
+                                        <View style={{paddingLeft: 18}}>
+                                            <Text onPress={() => this._choseCustomer(item.name, item.city, item.id)} style={{fontFamily: 'siemens_global_bold', fontSize: 16, lineHeight: 24, paddingTop: 9}}>{item.name}</Text>
+                                            <Text onPress={() => this._choseCustomer(item.name, item.city, item.id)} style={{fontFamily: 'siemens_global_roman', fontSize: 12, lineHeight: 20, color: '#505050'}}>{item.street}</Text>
+                                            <Text onPress={() => this._choseCustomer(item.name, item.city, item.id)} style={{fontFamily: 'siemens_global_roman', fontSize: 12, lineHeight: 20, color: '#505050', paddingBottom: 13}}>{item.plz}, {item.city}</Text>
+                                            </View>
+                                        <View style={{borderBottomColor: '#EAEAEA', borderBottomWidth: 1}}></View>
+                                    </View> 
+                                    }
+                                    keyExtractor={item => Math.random().toString()}
+                                    titleStyle={{fontFamily: 'siemens_global_bold', fontSize: 16, lineHeight: 24, backgroundColor: 'white' }}
+                                />
+                            </View>
+                        </Modal>
+
+                        <TouchableOpacity onPress={this._toggleModalTyp}><Text>Typ auswählen</Text></TouchableOpacity>
+                        <Label style={styles.labelText}>Typ: {this.state.typ}</Label>
+                        <Modal isVisible={this.state.isModalTypVisible} onBackButtonPress={this._toggleModalTyp} onBackdropPress={this._toggleModalTyp} style={{ backgroundColor: "white", 
+                            padding: 22,
+                            justifyContent: "center",
+                            alignItems: "center",
+                            borderRadius: 4,
+                            borderColor: "rgba(0, 0, 0, 0.1)",
+                            }}>
+                           <View>
+                            <FlatList
+                                    style={{backgroundColor: 'white', alignSelf: 'stretch', alignContent: 'stretch', marginTop: 10}} // https://stackoverflow.com/questions/33297367/100-width-in-react-native-flexbox
+                                    data={this.state.types}
+                                    renderItem={({item}) =>
+                                    <View style={{backgroundColor: '#f5f5f5'}}>
+                                        <View style={{paddingLeft: 18, borderLeftColor: item.color, borderLeftWidth: 5, height: 50, flex: 1}}>
+                                            <Text onPress={() => this._choseTyp(item.name, item.id)} style={{fontFamily: 'siemens_global_bold', fontSize: 16, lineHeight: 24, paddingTop: 9}}>{item.name}</Text>
+                                            </View>
+                                        <View style={{borderBottomColor: '#EAEAEA', borderBottomWidth: 1}}></View>
+                                    </View> 
+                                    }
+                                    keyExtractor={item => Math.random().toString()}
+                                    titleStyle={{fontFamily: 'siemens_global_bold', fontSize: 16, lineHeight: 24, backgroundColor: 'white' }}
+                                />
+                            </View>
+                        </Modal>
                     <Label style={styles.labelText}>Info</Label>
                         <TextInput style={{ backgroundColor: '#F1F1F1', height: 109,
                             borderRadius: 6,

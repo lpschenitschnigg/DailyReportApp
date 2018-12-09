@@ -90,8 +90,8 @@ class WelcomeScreen extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            name: 'l.pschenitschnigg@hak-bregenz.at',
-            password: 'qwertz1234',
+            name: '',
+            password: '',
             showToast: false,
             token: '',
             fixedHash: '',
@@ -107,11 +107,12 @@ class WelcomeScreen extends Component {
         client.query({
             query: gql`
             {
-                allAppusers{token, username, date, fixedHash}
+                allAppuserOwns{token, username, date, fixedHash}
             }
             `
         }).then(result => {
-            let dataQuery = result.data.allAppusers;
+            console.log(result);
+            let dataQuery = result.data.allAppuserOwns;
             //console.log(dataQuery);
             let trigger = false;
             dataQuery.forEach(element => {
@@ -124,8 +125,8 @@ class WelcomeScreen extends Component {
                 client.mutate({
                     variables: { token: this.state.token, username: name, fixedHash: StoreGlobal({type: 'get', key: 'ok'}), date: moment(new Date()) },
                     mutation: gql`
-                        mutation createAppuser($token: String!, $username: String!, $date: DateTime, $fixedHash: String){
-                            createAppuser(token: $token, username: $username, date: $date, fixedHash: $fixedHash) {
+                        mutation createAppuserOwn($token: String!, $username: String!, $date: DateTime, $fixedHash: String){
+                            createAppuserOwn(token: $token, username: $username, date: $date, fixedHash: $fixedHash) {
                                 token
                                 username
                                 date

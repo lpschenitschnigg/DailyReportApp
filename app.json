@@ -23,7 +23,8 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.siemens.dailyreport"
     },
     "android": {
       "package": "com.siemens.dailyreport",

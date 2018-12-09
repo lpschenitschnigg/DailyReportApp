@@ -183,7 +183,7 @@ class AufgabeErstellen extends Component {
         fetch('https://asc.siemens.at/datagate/external/Calendar/planned', {
             method: 'GET',
             headers: { 
-            'userhash': '9FFKqvr-iOfrwRkr48TCm-xqf6zjWUQqu063E9X3fRek9peiqq-edilVWGhRVMlweHR4',
+            'userhash': this.state.fixedHash,
             'Content-Type': 'application/json',
             },
         })
@@ -238,7 +238,7 @@ class AufgabeErstellen extends Component {
                  'Content-Type': 'application/json',
                  },
                  body: JSON.stringify({
-                 "fixedHash":"9FFKqvr-iOfrwRkr48TCm-xqf6zjWUQqu063E9X3fRek9peiqq-edilVWGhRVMlweHR4",
+                 "fixedHash": this.state.fixedHash,
                  "from": from,
                  "to": to,
                  'title': title,
@@ -461,9 +461,9 @@ class AufgabeErstellen extends Component {
                         paddingTop: 10,
                         borderRadius: 10,
                         backgroundColor: '#fff'}}>
-                        <Label style={{paddingTop: 18, fontSize: 18, marginBottom: 10, fontSize: 15, marginBottom: 10, color: '#606060', lineHeight: 18, fontFamily: 'siemens_global_bold'}}>Ort/Kunde</Label>
+                        <Label style={{paddingTop: 18, fontSize: 18, marginBottom: 10, fontSize: 15, marginBottom: 10, color: '#606060', lineHeight: 18, fontFamily: 'siemens_global_bold'}}>Titel</Label>
                             <TextInput style={styles.input} 
-                                placeholder='Ort/Kunde...'
+                                placeholder='Titel...'
                                 value={this.state.title}
                                 placeholderTextColor='#606060'
                                 underlineColorAndroid='#F1F1F1'
