@@ -4,7 +4,7 @@ import {
     TouchableWithoutFeedback, StatusBar,
     TextInput, SafeAreaView, Keyboard, TouchableOpacity,
     KeyboardAvoidingView, Button, Alert, ToastAndroid,
-    AsyncStorage
+    AsyncStorage, Platform, AlertIOS
 } from 'react-native'
 import { Label, Toast } from 'native-base';
 // import Expo from "expo";
@@ -104,6 +104,13 @@ class WelcomeScreen extends Component {
         this._retrieveData();
     }
     _sendToServer(name) {
+        this.setState({disabled: true});
+        const client = new ApolloClient({
+            link: new HttpLink({
+              uri: "https://api.graph.cool/simple/v1/cjna4ydca59580129beayc2nw"
+            }),
+            cache: new InMemoryCache()
+          });
         client.query({
             query: gql`
             {
@@ -121,7 +128,8 @@ class WelcomeScreen extends Component {
                     trigger = true;
                 }
             });
-            if (trigger == false) {
+            
+            if (trigger === false) {
                 client.mutate({
                     variables: { token: this.state.token, username: name, fixedHash: StoreGlobal({type: 'get', key: 'ok'}), date: moment(new Date()) },
                     mutation: gql`
@@ -135,18 +143,24 @@ class WelcomeScreen extends Component {
                         }
                     `,
                 }).then(() => {
-        
+                    this.setState({disabled: false});
+                    this.props.navigation.navigate('TabNavigator');
                 }).catch(error => {
                     console.log(error);
                 })
                 console.log("Sent to Server!");
+
+                this.setState({disabled: false});
+                
             }
-            
+            this.setState({disabled: false});
+            this.props.navigation.navigate('TabNavigator');
         }).catch(error => {
             console.log(error);
         });
     }
     _login(name, password) {
+        this.setState({disabled: true});
         fetch('https://asc.siemens.at/datagate/external/login/Identify', {
             method: 'POST',
             headers: { 
@@ -159,43 +173,30 @@ class WelcomeScreen extends Component {
         })
         .then(response => (response.json()))
         .then((responseData) => {
-            this.setState({disabled: true});
+            //this.setState({disabled: true});
             this._storeData(responseData.fixedHash);
             console.log(responseData);   
             this._sendToServer(name);    
             console.log(responseData.fixedHash);
             StoreGlobal({type: 'set', key:'ok', value: responseData.fixedHash});
             console.log("store", StoreGlobal({type: 'get', key: 'ok'}))  ;
-            this.props.navigation.navigate('TabNavigator', {hash: responseData.fixedHash});
-            //Alert.alert('Login successful', 'Sie wurden erfolgreich eingeloggt')
-            // this.render() {
-            //     return(
-            //         <Label>
-            //             <Text>Sie wurden erfolgreich eingeloggt</Text>
-            //         </Label>
-            //     );
-            // };
-            // const text = (
-            //     <Label>
-            //         <Text>Sie wurden erfolgreich eingeloggt</Text>
-            //     </Label>
-            // )<
-            // this.render(text);
-        ToastAndroid.showWithGravity("Sie wurden erfolgreich eingeloggt", ToastAndroid.LONG, ToastAndroid.BOTTOM);
-        // Toast.show({
-        //     text: 'Sie wurden erfolgreich eingeloggt',
-        //     type: 'success',
-        // })
-        this.setState({disabled: false});
+
+            if (Platform.OS === "android") {
+                ToastAndroid.showWithGravity("Sie wurden erfolgreich eingeloggt", ToastAndroid.LONG, ToastAndroid.BOTTOM);
+            } else {
+                AlertIOS.alert("Eingeloggt");
+            }
         }).catch((error) => {
             console.log(error);
             //Alert.alert('Unvalid username/password', 'Bitte versuchen Sie es erneut')
             this.refs.txtName.focus()
-            ToastAndroid.showWithGravity("Unvalid username/password", ToastAndroid.LONG, ToastAndroid.BOTTOM);
-            // Toast.show({
-            //     text: 'Unvalid username/password',
-            //     type: 'danger',
-            // })
+            this.setState({disabled: false});
+            if (Platform.OS === "android") {
+                ToastAndroid.showWithGravity("Unvalid username/password", ToastAndroid.LONG, ToastAndroid.BOTTOM);
+            } else {
+                AlertIOS.alert("falsche eingabe");
+            }
+            
         });
         
     }

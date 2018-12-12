@@ -197,7 +197,7 @@ class AufgabenSectionList extends Component {
         .then(aufgaben => {
             //this._color(aufgaben);
             this.setState({aufgaben: aufgaben});
-            console.log(aufgaben);
+            //console.log(aufgaben);
         })
         fetch('https://asc.siemens.at/datagate/external/Calendar/search', {
             method: 'POST',
