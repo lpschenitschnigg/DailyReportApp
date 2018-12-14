@@ -16,7 +16,8 @@ import gql from "graphql-tag";
 import {StoreGlobal} from './WelcomeScreen';
 import {StoreCus} from './Kundenauswahl';
 import {StoreTyp} from './Types';
-
+import { Segment } from 'expo';
+import { NavigationEvents } from 'react-navigation';
 const client = new ApolloClient({
     link: new HttpLink({
       uri: "https://api.graph.cool/simple/v1/cjna4ydca59580129beayc2nw"
@@ -180,6 +181,7 @@ class AufgabeErstellen extends Component {
         this.setState({ isModalTypVisible: !this.state.isModalTypVisible });
     }
     componentDidMount() {
+        
         fetch('https://asc.siemens.at/datagate/external/Calendar/planned', {
             method: 'GET',
             headers: { 
@@ -249,6 +251,7 @@ class AufgabeErstellen extends Component {
              .then((responseData) => {
                  console.log(responseData)
                  ToastAndroid.showWithGravity("Task erstellt", ToastAndroid.LONG, ToastAndroid.BOTTOM);
+                 Segment.track('Aufgabe erstellt');
                  // --- An unsere DB senden ---> Create WorkingOn
                  client.mutate({
                     variables: { content: this.state.content, from: this.state.from, to: this.state.to, title: this.state.title, customerId: this.state.customerid, typId: this.state.typid, workerId: this.state.workerid},
@@ -454,6 +457,7 @@ class AufgabeErstellen extends Component {
        
             return (
                 <ApolloProvider client={client}>
+                
                 <ScrollView style={{ backgroundColor: "#EAEAEA",
                     padding: 15,
                     paddingTop: 15}}>
@@ -659,6 +663,12 @@ class AufgabeErstellen extends Component {
                         </TouchableOpacity>
                     </View>
                 </ScrollView>
+                <NavigationEvents
+                    onWillFocus={payload => Segment.track('Erstellen Screen')}
+                    //onDidFocus={payload => console.log('did focus',payload)}
+                    //onWillBlur={payload => console.log('will blur',payload)}
+                    //onDidBlur={payload => console.log('did blur',payload)}
+                />
                 </ApolloProvider>
             );
         

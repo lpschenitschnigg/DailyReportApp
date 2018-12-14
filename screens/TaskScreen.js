@@ -7,7 +7,7 @@ import { ApolloClient } from 'apollo-client';
 import { HttpLink } from 'apollo-link-http';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import gql from "graphql-tag";
-
+import { Segment } from 'expo';
 const client = new ApolloClient({
     link: new HttpLink({
       uri: "https://api.graph.cool/simple/v1/cjna4ydca59580129beayc2nw"
@@ -62,6 +62,7 @@ class TaskScreen extends Component {
         //     // }, 1000);
             
         // });
+        Segment.track('Task Screen');
     }
     componentWillMount() {
         client.query({
@@ -198,6 +199,7 @@ class TaskScreen extends Component {
         )
     }
     render() {
+        
         return (
             <View style={{flex: 1}}>
                 <SectionList

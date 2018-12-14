@@ -7,7 +7,7 @@ import moment from 'moment';
 import Modal from 'react-native-modal';
 import {StoreGlobal} from './WelcomeScreen';
 import SmartLoader from './SmartLoader';
-
+import { Segment } from 'expo';
 // const Right = ({onPress}) => {
 //     <TouchableOpacity onPress={onPress}>
 //         <Icon name='md-log-out' style={{height: 28, width: 28, marginRight: 13, color: '#009999' }}></Icon>
@@ -58,6 +58,11 @@ class AufgabenSectionList extends Component {
             // }, 1000);
             
         });
+        var androidWriteKey = 'SNGOUdvxZxquSapWFMLMdPipDFT4mskU';
+        var iosWriteKey = '';
+        Segment.initialize({androidWriteKey,iosWriteKey});
+        Segment.identify(this.state.fixedHash);
+        Segment.track('Statusmeldungen Screen');
     }
     _setFixedHash(hash) {
         this.setState({fixedHash: hash});
