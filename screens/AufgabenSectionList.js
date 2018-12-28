@@ -6,7 +6,7 @@ import Moment from 'react-moment';
 import moment from 'moment';
 import Modal from 'react-native-modal';
 import {StoreGlobal} from './WelcomeScreen';
-import SmartLoader from './SmartLoader';
+
 import { Segment } from 'expo';
 // const Right = ({onPress}) => {
 //     <TouchableOpacity onPress={onPress}>

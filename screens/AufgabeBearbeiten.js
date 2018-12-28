@@ -208,7 +208,7 @@ class AufgabeBearbeiten extends Component {
                                     cancelBtnText="Cancel"
                                     showIcon={true}
                                     //color='#009999'
-                                    iconSource={require('./time.png')}
+                                    iconSource={require('../assets/time.png')}
                                     customStyles={{
                                         dateIcon: {
                                             //backgroundColor: '#979797'
@@ -250,7 +250,7 @@ class AufgabeBearbeiten extends Component {
                                     cancelBtnText="Cancel"
                                     showIcon={true}
                                     //color='#009999'
-                                    iconSource={require('./time.png')}
+                                    iconSource={require('../assets/time.png')}
                                     customStyles={{
                                         dateIcon: {
                                             //backgroundColor: '#979797'

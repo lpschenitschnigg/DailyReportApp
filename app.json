@@ -11,9 +11,9 @@
     ],
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./appicon/app_icon_minutenzeiger.png",
+    "icon": "./assets/appicon/app_icon_minutenzeiger.png",
     "splash": {
-      "image": "./splash/splashversion.png",
+      "image": "./assets/splash/splashversion.png",
       "resizeMode": "cover"
     },
     "updates": {

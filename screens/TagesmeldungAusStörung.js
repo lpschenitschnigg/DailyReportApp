@@ -584,7 +584,7 @@ class TagesmeldungAusStörung extends Component {
                                 showIcon={this.state.show1}
                                 hideText={this.state.show1}
                                 //color='#009999'
-                                iconSource={require('./time.png')}
+                                iconSource={require('../assets/time.png')}
                                 customStyles={{
                                     dateIcon: {
                                         //backgroundColor: '#979797'
@@ -635,7 +635,7 @@ class TagesmeldungAusStörung extends Component {
                                 showIcon={this.state.show2}
                                 hideText={this.state.show2}
                                 //color='#009999'
-                                iconSource={require('./time.png')}
+                                iconSource={require('../assets/time.png')}
                                 customStyles={{
                                     dateIcon: {
                                         marginTop:9,

@@ -263,7 +263,7 @@ class WelcomeScreen extends Component {
                             <View style={styles.logoContainer}>
                                 <View style={styles.logoContainer}>
                                     <Image style={styles.logo}
-                                        source={require('./icon+logo.png')}>
+                                        source={require('../assets/icon+logo.png')}>
                                     </Image>
                                 </View>
                                 <View style={styles.infoContainer}>

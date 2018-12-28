@@ -234,22 +234,22 @@ class AufgabeErstellen extends Component {
                 this.setState({disabled: true});
                 //this.setState({opacity: 0.5});
                 console.log('funktioniert');
-                 fetch('https://asc.siemens.at/datagate/external/Calendar/create', {
-                 method: 'POST',
-                 headers: { 
-                 'Content-Type': 'application/json',
-                 },
-                 body: JSON.stringify({
-                 "fixedHash": this.state.fixedHash,
-                 "from": from,
-                 "to": to,
-                 'title': title,
-                 'content' : content,
-                 }),
-             })
-             .then(response => (response.json()))
-             .then((responseData) => {
-                 console.log(responseData)
+                    fetch('https://asc.siemens.at/datagate/external/Calendar/create', {
+                        method: 'POST',
+                        headers: { 
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            "fixedHash": this.state.fixedHash,
+                            "from": from,
+                            "to": to,
+                            'title': title,
+                            'content' : content,
+                        }),
+                    })
+                    .then(response => (response.json()))
+                    .then((responseData) => {
+                        console.log(responseData)
                  ToastAndroid.showWithGravity("Task erstellt", ToastAndroid.LONG, ToastAndroid.BOTTOM);
                  Segment.track('Aufgabe erstellt');
                  // --- An unsere DB senden ---> Create WorkingOn
@@ -578,7 +578,7 @@ class AufgabeErstellen extends Component {
                                     showIcon={this.state.show1}
                                     hideText={this.state.show1}
                                     //color='#009999'
-                                    iconSource={require('./time.png')}
+                                    iconSource={require('../assets/time.png')}
                                     customStyles={{
                                         dateIcon: {
                                             //backgroundColor: '#979797'
@@ -629,7 +629,7 @@ class AufgabeErstellen extends Component {
                                     showIcon={this.state.show2}
                                     hideText={this.state.show2}
                                     //color='#009999'
-                                    iconSource={require('./time.png')}
+                                    iconSource={require('../assets/time.png')}
                                     customStyles={{
                                         dateIcon: {
                                             marginTop:9,
